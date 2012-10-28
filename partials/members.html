@@ -1,0 +1,27 @@
+<div class="container-fluid">
+	<div class="span12"> 
+		<h2>{{repository.name}}</h2>
+	</div>
+</div>
+
+<div class="container-fluid">
+	<div class="span12"> 
+		<div class="tabbable tabs-left">
+          <ul class="nav nav-tabs">
+            <li><a href="#/repo/{{repository.owner.login}}/{{repository.name}}">Home</a></li>
+            <li class="active"><a href="#/repo/{{repository.owner.login}}/{{repository.name}}/members">Members</a></li>
+            <li><a href="#/repo/{{repository.owner.login}}/{{repository.name}}/commits">Commits</a></li>
+          </ul>
+          <div class="tab-content">
+            <div id="members">
+              <ul>
+                <li ng-repeat="member in members">
+                  <img ng-src="{{member.avatar_url}}" alt="{{member.login}}"/>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+		
+	</div>
+</div>
