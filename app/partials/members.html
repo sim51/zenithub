@@ -39,10 +39,10 @@
       </div>
       <div class="info span10">
         <ul>
-          <li><strong>Name :</strong>{{user.name}}</li>
-          <li><strong>Mail :</strong><a href="mailto:{{user.email}}" title="Send a email to {{user.name}}">{{user.email}}</a></li>
-          <li><strong>Website :</strong><a href="{{user.blog}}" title="Website of {{user.name}}">{{user.blog}}</a></li>
-          <li><strong>Location :</strong>{{user.location}}</li>
+          <li ng-show="user.name"><strong>Name :</strong>{{user.name}}</li>
+          <li ng-show="user.email"><strong>Mail :</strong><a href="mailto:{{user.email}}" title="Send a email to {{user.name}}">{{user.email}}</a></li>
+          <li ng-show="user.blog"><strong>Website :</strong><a href="{{user.blog}}" title="Website of {{user.name}}">{{user.blog}}</a></li>
+          <li ng-show="user.location"><strong>Location :</strong>{{user.location}}</li>
         </ul>
       </div>
     </div>

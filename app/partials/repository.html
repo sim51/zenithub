@@ -18,8 +18,8 @@
           			<img ng-src="{{repository.owner.avatar_url}}"/>
           		</div>
           		<div class="span10">
-          			<p>{{repository.description}}</p>
-          			<div><strong>Language : </strong>{{repository.language}}</div>
+          			<p ng-show="repository.description">{{repository.description}}</p>
+          			<div ng-show="repository.language"><strong>Language : </strong>{{repository.language}}</div>
           			<div><strong>Url : </strong><a href="http://github.com/{{repository.owner.login}}/{{repository.name}}" title="Go to github">http://github.com/{{repository.owner.login}}/{{repository.name}}</a></div>
           			<div><strong>Forks : </strong>{{repository.forks}}</div>
           			<div><strong>Watchers : </strong>{{repository.watchers}}</div>
