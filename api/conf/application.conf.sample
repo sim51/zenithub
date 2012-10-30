@@ -1,0 +1,113 @@
+# This is the main configuration file for the application.
+# ~~~~~
+application.name=api
+
+# Application config
+# ~~~~~
+github.username=sim51
+github.password=sim51
+
+# Application mode
+# ~~~~~
+application.mode=dev
+%prod.application.mode=prod
+
+# Secret key
+# ~~~~~
+application.secret=69LiLkrMFcxANp7AetD1JeLCLB5pItY0Uymsewc3h1JVxq7xw1rGWrDm3BQwWLwS
+
+# Date format
+# ~~~~~
+date.format=yyyy-MM-dd
+
+# Server configuration
+# ~~~~~
+http.port=9005
+
+# Log level
+# ~~~~~
+application.log=DEBUG
+
+# JPA Configuration (Hibernate)
+# ~~~~~
+# Store path for Blob content
+attachments.path=data/attachments
+
+# Memcached configuration
+# ~~~~~ 
+# Enable memcached if needed. Otherwise a local cache is used.
+# memcached=enabled
+#
+# Specify memcached host (default to 127.0.0.1:11211)
+# memcached.host=127.0.0.1:11211
+#
+# Or you can specify multiple host to build a distributed cache
+# memcached.1.host=127.0.0.1:11211
+# memcached.2.host=127.0.0.1:11212
+#
+# Use plain SASL to authenticate for memcached
+# memcached.user=
+# memcached.password=
+
+# HTTP Response headers control for static files
+# ~~~~~
+# Set the default max-age, telling the user's browser how long it should cache the page.
+# Default is 3600 (one hour). Set it to 0 to send no-cache.
+# This is only read in prod mode, in dev mode the cache is disabled.
+# http.cacheControl=3600
+
+# If enabled, Play will generate entity tags automatically and send a 304 when needed.
+# Default is true, set it to false to deactivate use of entity tags.
+# http.useETag=true
+
+# Custom mime types
+# mimetype.xpi=application/x-xpinstall
+
+# WS configuration
+# ~~~~~
+# Default engine is Async Http Client, uncomment to use
+# the JDK's internal implementation
+# webservice = urlfetch
+# If you need to set proxy params for WS requests
+# http.proxyHost = localhost
+# http.proxyPort = 3128
+# http.proxyUser = jojo
+# http.proxyPassword = jojo
+
+# Mail configuration
+# ~~~~~ 
+# Default is to use a mock Mailer
+mail.smtp=mock
+
+# Or, specify mail host configuration
+# mail.smtp.host=127.0.0.1
+# mail.smtp.user=admin
+# mail.smtp.pass=
+# mail.smtp.channel=ssl
+
+# Url-resolving in Jobs
+# ~~~~~~
+# When rendering templates with reverse-url-resoling (@@{..}) in Jobs (which do not have an inbound Http.Request),
+# ie if sending a HtmlMail, Play need to know which url your users use when accessing your app.
+# %test.application.baseUrl=http://localhost:9000/
+# %prod.application.baseUrl=http://www.yourdomain.com/
+
+# Jobs executor
+# ~~~~~~
+# Size of the Jobs pool
+# play.jobs.pool=10
+
+# Execution pool
+# ~~~~~
+# Default to 1 thread in DEV mode or (nb processors + 1) threads in PROD mode.
+# Try to keep a low as possible. 1 thread will serialize all requests (very useful for debugging purpose)
+# play.pool=3
+
+# Testing. Set up a custom configuration for test mode
+# ~~~~~
+#%test.module.cobertura=${play.path}/modules/cobertura
+%test.application.mode=dev
+%test.db.url=jdbc:h2:mem:play;MODE=MYSQL;LOCK_MODE=0
+%test.jpa.ddl=create
+%test.mail.smtp=mock
+

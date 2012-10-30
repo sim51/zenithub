@@ -7,6 +7,8 @@ import java.util.Map;
 
 import models.Impact;
 import play.Logger;
+import play.Play;
+import play.cache.Cache;
 import play.libs.F;
 import play.libs.F.Promise;
 import play.libs.WS;
@@ -21,18 +23,26 @@ import com.google.gson.JsonObject;
 
 public class Application extends Controller {
 
-    private final static String url        = "https://api.github.com/";
+    private final static String  gihubUrl   = "https://api.github.com/";
 
-    private final static String NB_COMMITS = "commits";
-    private final static String ADDITIONS  = "additions";
-    private final static String DELETIONS  = "deletions";
+    private final static Integer PER_PAGE   = 100;
+    private final static String  NB_COMMITS = "commits";
+    private final static String  ADDITIONS  = "additions";
+    private final static String  DELETIONS  = "deletions";
 
     public static void impact(String owner, String repo) {
 
-        // Do github async call for commits
-        Promise<HttpResponse> futurResponse = WS.url(url + "repos/" + owner + "/" + repo + "/commits?per_page=100")
-                .authenticate("sim51", "u09jxrpn").getAsync();
-        WS.HttpResponse res = await(futurResponse);
+        String ghUser = Play.configuration.getProperty("github.username");
+        String ghPwd = Play.configuration.getProperty("github.password");
+        String url = gihubUrl + "repos/" + owner + "/" + repo + "/commits?per_page=" + PER_PAGE;
+
+        // look up in cache first
+        WS.HttpResponse res = (HttpResponse) Cache.get(url);
+        if (Cache.get(url) == null) {
+            // Do github async call for commits
+            Promise<HttpResponse> futurResponse = WS.url(url).authenticate(ghUser, ghPwd).getAsync();
+            res = await(futurResponse);
+        }
 
         // List of all async response
         List<Promise<HttpResponse>> futurCommits = new ArrayList<Promise<HttpResponse>>();
@@ -46,7 +56,7 @@ public class Application extends Controller {
 
                 // Do github async call for commit
                 String commitUrl = commit.get("url").getAsString();
-                futurCommits.add(WS.url(commitUrl).authenticate("sim51", "u09jxrpn").getAsync());
+                futurCommits.add(WS.url(commitUrl).authenticate(ghUser, ghPwd).getAsync());
             }
             F.Promise<List<WS.HttpResponse>> promises = F.Promise.waitAll(futurCommits);
             List<WS.HttpResponse> httpResponses = await(promises);

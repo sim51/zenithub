@@ -1,7 +1,8 @@
-.api/eclipse
-.api/test
-.api/test-result
-.api/tmp
-.api/conf/application.conf
-.api/.settings/
+api/eclipse
+api/test
+api/test-result
+api/tmp
+api/conf/application.conf
+api/.settings/
+api/.classpath
 .project
