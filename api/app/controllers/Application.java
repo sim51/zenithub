@@ -37,11 +37,15 @@ public class Application extends Controller {
         String url = gihubUrl + "repos/" + owner + "/" + repo + "/commits?per_page=" + PER_PAGE;
 
         // look up in cache first
-        WS.HttpResponse res = (HttpResponse) Cache.get(url);
-        if (Cache.get(url) == null) {
+        List<Impact> responseObj = (List<Impact>) Cache.get(url);
+        if (Cache.get(url) != null) {
+            renderJSON(responseObj);
+        }
+        else {
+            responseObj = new ArrayList<Impact>();
             // Do github async call for commits
             Promise<HttpResponse> futurResponse = WS.url(url).authenticate(ghUser, ghPwd).getAsync();
-            res = await(futurResponse);
+            WS.HttpResponse res = await(futurResponse);
 
             // List of all async response
             List<Promise<HttpResponse>> futurCommits = new ArrayList<Promise<HttpResponse>>();
@@ -62,7 +66,6 @@ public class Application extends Controller {
 
                 // key : login | value : its position into response arraylist
                 Map<String, Integer> authorStack = new HashMap<String, Integer>();
-                List<Impact> response = new ArrayList<Impact>();
 
                 for (int j = 0; j < httpResponses.size(); j++) {
                     HttpResponse commitResponse = httpResponses.get(j);
@@ -78,11 +81,11 @@ public class Application extends Controller {
                             if (!authorStack.containsKey(login)) {
                                 Impact impact = new Impact();
                                 impact.author = author;
-                                response.add(impact);
-                                authorStack.put(login, response.size() - 1);
+                                responseObj.add(impact);
+                                authorStack.put(login, responseObj.size() - 1);
                             }
 
-                            Impact impact = response.get(authorStack.get(login));
+                            Impact impact = responseObj.get(authorStack.get(login));
 
                             // retrive response commit data
                             Integer deletions = object.get("stats").getAsJsonObject().get("deletions").getAsInt();
@@ -112,16 +115,16 @@ public class Application extends Controller {
                 }
 
                 // last loop to do nb commit
-                for (int j = 0; j < response.size(); j++) {
-                    Impact impact = response.get(j);
+                for (int j = 0; j < responseObj.size(); j++) {
+                    Impact impact = responseObj.get(j);
                     impact.impacts.put(NB_COMMITS, impact.commits.size());
                 }
-                Cache.add(url, response, "1h");
+                Cache.add(url, responseObj, "1h");
+                renderJSON(responseObj);
             }
-            renderJSON(response);
-        }
-        else {
-            error();
+            else {
+                error();
+            }
         }
     }
 
