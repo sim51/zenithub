@@ -7,23 +7,23 @@
 <div class="row-fluid">
 	<div class="span12"> 
 		<div class="tabbable tabs-left">
-      <ul class="nav nav-tabs">
-        <li><a href="#/repo/{{repository.owner.login}}/{{repository.name}}">Home</a></li>
-        <li class="active"><a href="#/repo/{{repository.owner.login}}/{{repository.name}}/members">Members</a></li>
-        <li><a href="#/repo/{{repository.owner.login}}/{{repository.name}}/commits">Commits</a></li>
-      </ul>
-      <div class="tab-content">
-        <div id="members">
-          <ul>
-            <li ng-repeat="member in members">
-              <a ng-click="popupMember(member)" title="{{member.login}}" >
-                <img ng-src="{{member.avatar_url}}" alt="{{member.login}}"/>
-              </a>
-            </li>
+          <ul class="nav nav-tabs">
+            <li><a href="#/repo/{{repository.owner.login}}/{{repository.name}}">Home</a></li>
+            <li class="active"><a href="#/repo/{{repository.owner.login}}/{{repository.name}}/members">Members</a></li>
+            <li><a href="#/repo/{{repository.owner.login}}/{{repository.name}}/commits">Commits</a></li>
           </ul>
+          <div class="tab-content ng-cloak">
+            <div id="members">
+              <ul>
+                <li ng-repeat="member in members">
+                  <a ng-click="popupMember(member)" title="{{member.login}}" >
+                    <img ng-src="{{member.avatar_url}}" alt="{{member.login}}"/>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
 	</div>
 </div>
 
@@ -33,7 +33,7 @@
     <h3>{{user.login}}</h3>
   </div>
   <div class="modal-body">
-    <div class="row-fluid user">
+    <div class="row-fluid user ng-cloak">
       <div class="span2"> 
         <img ng-src="{{user.avatar_url}}" alt="{{user.login}}" />
       </div>

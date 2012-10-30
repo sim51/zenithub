@@ -12,10 +12,6 @@ function RepositoryListCtrl($scope, $rootScope, $routeParams, $location, $github
 		});
 	}
 	$scope.orderProp = 'name';
-	$rootScope.searchRepository = function() {
-		var keyword = $scope.q;
-		$location.path('/search/'+ keyword);
-	}
 }
 
 /* 
@@ -27,10 +23,6 @@ function RepositoryHomeCtrl($scope, $rootScope, $routeParams,$location, $github)
 	$github.repo(owner, repo).then(function(response){
 		$scope.repository = response;
 	});
-	$rootScope.searchRepository = function() {
-		var keyword = $scope.q;
-		$location.path('/search/'+ keyword);
-	}
 }
 
 /* 
@@ -49,10 +41,6 @@ function RepositoryMembersCtrl($scope, $rootScope, $routeParams, $location, $git
 			$('#member').modal('show');
 		});
 	};
-	$rootScope.searchRepository = function() {
-		var keyword = $scope.q;
-		$location.path('/search/'+ keyword);
-	}
 }
 
 
@@ -80,10 +68,6 @@ function RepositoryCommitsCtrl($scope, $rootScope, $routeParams,$location, $play
 			Raphael("deletions", 700, 700).pieChart(350, 350, 200, deletions, labels, "#fff");
 		
 	});
-	$rootScope.searchRepository = function() {
-		var keyword = $scope.q;
-		$location.path('/search/'+ keyword);
-	}
 }
 
 function ErrorCtrl() {

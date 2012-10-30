@@ -5,4 +5,7 @@ api/tmp
 api/conf/application.conf
 api/.settings/
 api/.classpath
+api/logs
+api/server.pid
 .project
+

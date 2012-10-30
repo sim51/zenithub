@@ -2,6 +2,11 @@ body{
 	padding-top: 40px;
     position: relative;
 }
+.ng-cloak {
+  /* this will change to block when scope and angular is ready */
+  display:none;
+}
+
 
 #searchForm {
     margin-left: auto;
@@ -66,7 +71,7 @@ div.repository img{
 }
 div.raphael{
 	margin-top: -100px;
-	height: 600px;
+	height: 630px;
 	overflow:hidden;
 }
 svg{
