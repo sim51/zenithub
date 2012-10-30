@@ -37,11 +37,10 @@ public class Application extends Controller {
         String url = gihubUrl + "repos/" + owner + "/" + repo + "/commits?per_page=" + PER_PAGE;
 
         // look up in cache first
-        WS.HttpResponse res = (HttpResponse) Cache.get(url);
         if (Cache.get(url) == null) {
             // Do github async call for commits
             Promise<HttpResponse> futurResponse = WS.url(url).authenticate(ghUser, ghPwd).getAsync();
-            res = await(futurResponse);
+            WS.HttpResponse res = await(futurResponse);
 
             // List of all async response
             List<Promise<HttpResponse>> futurCommits = new ArrayList<Promise<HttpResponse>>();
