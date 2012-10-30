@@ -1,7 +1,7 @@
 'use strict';
 
 var githuburl = 'https://api.github.com';
-var playurl = 'http://localhost:9005';
+var playurl = 'http://api.zenithub.logisima.com';
 
 /* Services */
 angular.module('github', [ ])
