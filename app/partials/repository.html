@@ -1,32 +1,44 @@
 <div class="row-fluid">
-	<div class="span12"> 
-		<h2>{{repository.name}}</h2>
-	</div>
+    <div class="span12">
+        <h2>{{repository.name}}</h2>
+    </div>
 </div>
-
 <div class="row-fluid">
-	<div class="span12"> 
-		<div class="tabbable tabs-left">
-          <ul class="nav nav-tabs">
-            <li class="active"><a href="#/repo/{{repository.owner.login}}/{{repository.name}}">Home</a></li>
-            <li><a href="#/repo/{{repository.owner.login}}/{{repository.name}}/members">Members</a></li>
-            <li><a href="#/repo/{{repository.owner.login}}/{{repository.name}}/commits">Commits</a></li>
-          </ul>
-          <div class="tab-content repository ng-cloak">
-          	<div class="row-fluid">
-          		<div class="span2">
-          			<img ng-src="{{repository.owner.avatar_url}}"/>
-          		</div>
-          		<div class="span10">
-          			<p ng-show="repository.description">{{repository.description}}</p>
-          			<div ng-show="repository.language"><strong>Language : </strong>{{repository.language}}</div>
-          			<div><strong>Url : </strong><a href="http://github.com/{{repository.owner.login}}/{{repository.name}}" title="Go to github">http://github.com/{{repository.owner.login}}/{{repository.name}}</a></div>
-          			<div><strong>Forks : </strong>{{repository.forks}}</div>
-          			<div><strong>Watchers : </strong>{{repository.watchers}}</div>
-          		</div>
-          	</div>
-          </div>
+    <div class="row-fluid content">
+        <div class="span2">
+            <div class="tabbable tabs-left">
+                <ul id="sidenav" class="nav nav-tabs " data-spy="affix">
+                    <li class="active"><a href="#/repo/{{repository.owner.login}}/{{repository.name}}">Home</a></li>
+                    <li"><a href="#/repo/{{repository.owner.login}}/{{repository.name}}/members">Members</a></li>
+                    <li><a href="#/repo/{{repository.owner.login}}/{{repository.name}}/commits">Commits</a></li>
+                    <li><a href="#/repo/{{repository.owner.login}}/{{repository.name}}/stats/commit">Commit stat. </a></li>
+                    <li><a href="#/repo/{{repository.owner.login}}/{{repository.name}}/stats/geo">Geo stat.</a></li>
+                </ul>
+                <div class="tab-content ng-cloak"></div>
+            </div>
         </div>
-		
-	</div>
+        <div class="span10">
+            <div class="row-fluid">
+                <div class="span2">
+                    <img ng-src="{{repository.owner.avatar_url}}" />
+                </div>
+                <div class="span10">
+                    <p ng-show="repository.description">{{repository.description}}</p>
+                    <div ng-show="repository.language">
+                        <strong>Language : </strong>{{repository.language}}
+                    </div>
+                    <div>
+                        <strong>Url : </strong><a href="http://github.com/{{repository.owner.login}}/{{repository.name}}" title="Go to github">http://github.com/{{repository.owner.login}}/{{repository.name}}</a>
+                    </div>
+                    <div>
+                        <strong>Forks : </strong>{{repository.forks}}
+                    </div>
+                    <div>
+                        <strong>Watchers : </strong>{{repository.watchers}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </div>

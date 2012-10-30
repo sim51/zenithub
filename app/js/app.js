@@ -7,8 +7,9 @@ app.config(function($routeProvider) {
 		$routeProvider
 			.when('/error', {templateUrl: 'partials/error.html', controller: ErrorCtrl})
 	      	.when('/repo/:owner/:repository', {templateUrl: 'partials/repository.html', controller: RepositoryHomeCtrl})
-	      	.when('/repo/:owner/:repository/commits', {templateUrl: 'partials/commits.html', controller: RepositoryCommitsCtrl})
 	      	.when('/repo/:owner/:repository/members', {templateUrl: 'partials/members.html', controller: RepositoryMembersCtrl})
+	      	.when('/repo/:owner/:repository/commits', {templateUrl: 'partials/commits.html', controller: RepositoryCommitsCtrl})
+	      	.when('/repo/:owner/:repository/stats/commit', {templateUrl: 'partials/stats_commit.html', controller: RepositoryStatsCommitCtrl})
 	      	.when('/search/:keyword', {templateUrl: 'partials/search.html',   controller: RepositoryListCtrl})
 	      	.otherwise({redirectTo: '/search/'});
 	});

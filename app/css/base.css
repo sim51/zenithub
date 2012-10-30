@@ -6,8 +6,12 @@ body{
   /* this will change to block when scope and angular is ready */
   display:none;
 }
-
-
+.breaker{
+	clear:both;
+}
+.even{
+	background-color:#E3E3E3;
+}
 #searchForm {
     margin-left: auto;
     margin-right: auto;
@@ -21,42 +25,46 @@ body{
 	text-align: center;
     width: 100%;
 }
-
 h2{
 	font-size:21px;
 	line-height:21px;
 	text-align: center;
 }
-.commits h3{
+.content h3{
 	font-size:18px;
 	font-weight: normal;
 	border-bottom: 1px solid #DDDDDD;
 }
-
+#sidenav {
+	margin-right:0px;
+}
 ul.repositories{
 	list-style:none;
 }
-
+ul.repositories li {
+	margin:0px;
+}
+ul.repositories li{
+	padding: 10px;
+	border-radius: 10px;
+}
 div.repository div strong{
 	width:100px;
 }
-
 div.repository img{
 	display:block;
 	margin:0 auto;
 }
-
-#members ul{
+.members ul{
 	list-style: none;
 }
-#members ul li{
+.members ul li{
 	display:block;
 	float:left;
 }
-#members img{
+.members img{
 	width:80px;
 }
-
 #member .user img{
 	display:block;
 	float:left;

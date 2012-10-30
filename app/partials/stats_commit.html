@@ -10,20 +10,20 @@
                 <ul id="sidenav" class="nav nav-tabs " data-spy="affix">
                     <li><a href="#/repo/{{repository.owner.login}}/{{repository.name}}">Home</a></li>
                     <li><a href="#/repo/{{repository.owner.login}}/{{repository.name}}/members">Members</a></li>
-                    <li class="active"><a href="#/repo/{{repository.owner.login}}/{{repository.name}}/commits">Commits</a></li>
-                    <li><a href="#/repo/{{repository.owner.login}}/{{repository.name}}/stats/commit">Commit stat. </a></li>
+                    <li><a href="#/repo/{{repository.owner.login}}/{{repository.name}}/commits">Commits</a></li>
+                    <li class="active"><a href="#/repo/{{repository.owner.login}}/{{repository.name}}/stats/commit">Commit stat. </a></li>
                     <li><a href="#/repo/{{repository.owner.login}}/{{repository.name}}/stats/geo">Geo stat.</a></li>
                 </ul>
                 <div class="tab-content ng-cloak"></div>
             </div>
         </div>
         <div class="span10">
-            <h3>Last 100 commits</h3>
-            <ul class="commits">
-                <li ng-repeat="commit in commits" ng-class-even="'even'" ng-class-odd="'odd'"><a href="#/repo/{{repository.owner}}/{{repository.name}}"> {{repository.owner}} /
-                        {{repository.name}} </a> <span>({{repository.language}})</span>
-                    <p>{{repository.description}}</p></li>
-            </ul>
+            <h3>Commits Impacts</h3>
+            <div id="commits" class="raphael"></div>
+            <h3>Additions Impacts</h3>
+            <div id="additions" class="raphael"></div>
+            <h3>Deletions Impacts</h3>
+            <div id="deletions" class="raphael"></div>
         </div>
     </div>
 </div>

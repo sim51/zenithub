@@ -1,8 +1,8 @@
 'use strict';
 
 /* 
-	Search a repository (/search/:keyword).
-*/
+ *	Search a repository (/search/:keyword).
+ */
 function RepositoryListCtrl($scope, $rootScope, $routeParams, $location, $github) {
 	var keyword = $routeParams.keyword  || '';
 	$scope.keyword = keyword;
@@ -15,19 +15,20 @@ function RepositoryListCtrl($scope, $rootScope, $routeParams, $location, $github
 }
 
 /* 
-	Repository general informations (/repo/:owner/:repo).
-*/
+ *	Repository general informations (/repo/:owner/:repo).
+ */
 function RepositoryHomeCtrl($scope, $rootScope, $routeParams,$location, $github) {
 	var owner = $routeParams.owner;
 	var repo = $routeParams.repository;
 	$github.repo(owner, repo).then(function(response){
 		$scope.repository = response;
 	});
+    $('#sidenav').affix();
 }
 
 /* 
-	Repository members informations (/repo/:owner/:repo/collaborators).
-*/
+ *	Repository members informations (/repo/:owner/:repo/collaborators).
+ */
 function RepositoryMembersCtrl($scope, $rootScope, $routeParams, $location, $github) {
 	var owner = $routeParams.owner;
 	var repo = $routeParams.repository;
@@ -35,19 +36,35 @@ function RepositoryMembersCtrl($scope, $rootScope, $routeParams, $location, $git
 	$github.members(owner, repo).then(function(response){
 		$scope.members = response;
 	});
+	$github.contributors(owner, repo).then(function(response){
+		$scope.contributors = response;
+	});
 	$scope.popupMember = function (member){
 		$github.user(member.login).then(function(response){
 			$scope.user = response;
 			$('#member').modal('show');
 		});
 	};
+	$('#sidenav').affix();
 }
 
+/* 
+ *  Repository commits informations (/repo/:owner/:repo/commits).
+ */
+function RepositoryCommitsCtrl($scope, $rootScope, $routeParams,$location, $github) {
+	var owner = $routeParams.owner;
+	var repo = $routeParams.repository;
+	$scope.repository = {owner:{login:owner}, name:repo};
+	$github.commits(owner, repo).then(function(response){
+		$scope.commits = response;
+	});
+	$('#sidenav').affix();
+}
 
 /* 
-	Repository commits informations (/repo/:owner/:repo/commits).
-*/
-function RepositoryCommitsCtrl($scope, $rootScope, $routeParams,$location, $play) {
+ *	Repository commits stats(/repo/:owner/:repo/stats/commit).
+ */
+function RepositoryStatsCommitCtrl($scope, $rootScope, $routeParams,$location, $play) {
 	var owner = $routeParams.owner;
 	var repo = $routeParams.repository;
 	$scope.repository = {owner:{login:owner}, name:repo};
@@ -68,7 +85,18 @@ function RepositoryCommitsCtrl($scope, $rootScope, $routeParams,$location, $play
 			Raphael("deletions", 700, 700).pieChart(350, 350, 200, deletions, labels, "#fff");
 		
 	});
+	$('#sidenav').affix();
 }
 
+/* 
+ *  Repository geo stats (/repo/:owner/:repo/stats/geo).
+ */
+function RepositoryStatsGeoCtrl($scope, $rootScope, $routeParams,$location, $play) {
+	$('#sidenav').affix();
+}
+
+/*
+ *  Error.
+ */
 function ErrorCtrl() {
 }

@@ -60,6 +60,19 @@ angular.module('github', [ ])
                         }
                     });   
             },
+            contributors:function(owner, repo){
+                $('#loading').modal('show');
+                var url = githuburl + '/repos/' + owner + '/' + repo  + '/contributors?callback=JSON_CALLBACK';
+                return $http.jsonp( url, {cache:true} )
+                    .then(function (response){
+                        $('#loading').modal('hide');
+                        if( response.status == 200 && response.data.meta.status == 200){
+                            return response.data.data;
+                        }else{
+                            $location.path('/error');
+                        }
+                    });   
+            },
             user:function(login){
                 var url = githuburl + '/users/' + login  + '?callback=JSON_CALLBACK';
                 return $http.jsonp( url, {cache:true} )
