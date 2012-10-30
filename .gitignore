@@ -3,4 +3,4 @@
 ./api/test-result
 ./api/tmp
 ./api/conf/application.conf
-
+.project

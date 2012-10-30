@@ -1,10 +1,12 @@
-<div class="container-fluid">
+<div class="row-fluid">
 	<div class="span12">
 		<ul class="repositories">
        		<li ng-repeat="repository in repositories" ng-class-even="'even'" ng-class-odd="'odd'">
        			<a href="#/repo/{{repository.owner}}/{{repository.name}}">
-       				{{repository.owner}} - {{repository.name}}
+       				{{repository.owner}} / {{repository.name}}
        			</a>
+       			<span>({{repository.language}})</span>
+       			<p>{{repository.description}}</p>
        		</li>
   		</ul>
 	</div>

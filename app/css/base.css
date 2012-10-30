@@ -1,0 +1,70 @@
+body{
+	padding-top: 40px;
+    position: relative;
+}
+
+#searchForm {
+    margin-left: auto;
+    margin-right: auto;
+    width: 420px;
+}
+
+h2{
+	font-size:21px;
+	line-height:21px;
+	text-align: center;
+}
+h3{
+	font-size:18px;
+	font-weight: normal;
+	border-bottom: 1px solid #DDDDDD;
+}
+
+ul.repositories{
+	list-style:none;
+}
+
+div.repository div strong{
+	width:100px;
+}
+
+div.repository img{
+	display:block;
+	margin:0 auto;
+}
+
+#members ul{
+	list-style: none;
+}
+#members ul li{
+	display:block;
+	float:left;
+}
+
+#member .user img{
+	display:block;
+	float:left;
+}
+#member .user div.info{
+	float:left;
+}
+#member .user div.info ul{
+	list-style:none;
+}
+#member .user div.info ul li *{
+	display: block;
+	float:left;
+}
+#member .user div.info ul li strong{
+	width:100px;
+}
+
+div.raphael{
+	margin-top: -100px;
+	height: 600px;
+	overflow:hidden;
+}
+svg{
+	display: block;
+	margin: 0 auto;
+}

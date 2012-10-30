@@ -1,10 +1,10 @@
-<div class="container-fluid">
+<div class="row-fluid">
 	<div class="span12"> 
 		<h2>{{repository.name}}</h2>
 	</div>
 </div>
 
-<div class="container-fluid">
+<div class="row-fluid">
 	<div class="span12"> 
 		<div class="tabbable tabs-left">
           <ul class="nav nav-tabs">
@@ -12,18 +12,17 @@
             <li><a href="#/repo/{{repository.owner.login}}/{{repository.name}}/members">Members</a></li>
             <li><a href="#/repo/{{repository.owner.login}}/{{repository.name}}/commits">Commits</a></li>
           </ul>
-          <div class="tab-content">
+          <div class="tab-content repository">
           	<div class="row-fluid">
           		<div class="span2">
           			<img ng-src="{{repository.owner.avatar_url}}"/>
-          			<div>{{repository.owner.login}}</div>
           		</div>
           		<div class="span10">
           			<p>{{repository.description}}</p>
-          			<div><span class="bold">Language : </span>{{repository.language}}</div>
-          			<div><span class="bold">Url : </span>{{repository.url}}</div>
-          			<div><span class="bold">Forks : </span>{{repository.forks}}</div>
-          			<div><span class="bold">Watchers : </span>{{repository.watchers}}</div>
+          			<div><strong>Language : </strong>{{repository.language}}</div>
+          			<div><strong>Url : </strong>{{repository.url}}</div>
+          			<div><strong>Forks : </strong>{{repository.forks}}</div>
+          			<div><strong>Watchers : </strong>{{repository.watchers}}</div>
           		</div>
           	</div>
           </div>

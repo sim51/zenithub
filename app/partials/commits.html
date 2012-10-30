@@ -1,10 +1,10 @@
-<div class="container-fluid">
+<div class="row-fluid">
 	<div class="span12"> 
 		<h2>{{repository.name}}</h2>
 	</div>
 </div>
 
-<div class="container-fluid">
+<div class="row-fluid">
 	<div class="span12"> 
 		<div class="tabbable tabs-left">
           <ul class="nav nav-tabs">
@@ -13,15 +13,13 @@
             <li class="active"><a href="#/repo/{{repository.owner.login}}/{{repository.name}}/commits">Commits</a></li>
           </ul>
           <div class="tab-content">
-            <div id="commits">
-              <ul>
-                <li ng-repeat="commit in commits">
-                  <div class="commit">
-                    {{commit.url}}
-                  </div>
-                </li>
-              </ul>
-            </div>
+            <h3>Commits Impacts</h3>
+            <div id="commits" class="raphael"></div>
+            <h3>Additions Impacts</h3>
+            <div id="additions" class="raphael"></div>
+            <h3>Deletions Impacts</h3>
+            <div id="deletions" class="raphael"></div>
+            
           </div>
         </div>
 	</div>
