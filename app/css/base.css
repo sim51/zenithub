@@ -14,7 +14,7 @@ h2{
 	line-height:21px;
 	text-align: center;
 }
-h3{
+.commits h3{
 	font-size:18px;
 	font-weight: normal;
 	border-bottom: 1px solid #DDDDDD;
