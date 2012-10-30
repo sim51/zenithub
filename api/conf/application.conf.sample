@@ -5,7 +5,7 @@ application.name=api
 # Application config
 # ~~~~~
 github.username=sim51
-github.password=sim51
+github.password=
 
 # Application mode
 # ~~~~~
