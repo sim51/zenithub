@@ -13,6 +13,14 @@ body{
     margin-right: auto;
     width: 420px;
 }
+#searchForm label{
+	display:block;
+	text-align: center;
+}
+#searchForm div {
+	text-align: center;
+    width: 100%;
+}
 
 h2{
 	font-size:21px;

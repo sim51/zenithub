@@ -3,7 +3,7 @@
   <head>
     <title>LogiSima - Github</title>
     <meta charset="utf-8">
-    <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.1.1/css/bootstrap-combined.min.css" rel="stylesheet">
+    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="/css/base.css" rel="stylesheet">
     <script src="lib/angular/angular.js"></script>
     <script src="js/app.js"></script>
@@ -39,10 +39,12 @@
         <form class="well form-search" ng-submit="searchRepository()">
           <div id="searchForm">
             <label class="control-label" for="search">
-              Search  : 
+              Search a github repository
             </label>
-            <input id="search" ng-model="q" value="{{keyword}}">
-            <button type="submit" class="btn" ><i class="icon-search"></i> Search</button>
+            <div>
+                <input id="search" ng-model="q" value="{{keyword}}">
+                <button type="submit" class="btn" ><i class="icon-search"></i> Search</button>
+             </div>
           </div>
         </form>
       </div>
@@ -68,6 +70,6 @@
     <script src="lib/raphael/raphael.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
     <script src="lib/raphael/pie.js"></script>
-    <script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.1.1/js/bootstrap.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.1.1/js/bootstrap.min.js"></script>
   </body>
 </html>
