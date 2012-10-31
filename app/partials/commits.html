@@ -20,9 +20,8 @@
         <div class="span10">
             <h3>Last 100 commits</h3>
             <ul class="commits">
-                <li ng-repeat="commit in commits" ng-class-even="'even'" ng-class-odd="'odd'"><a href="#/repo/{{repository.owner}}/{{repository.name}}"> {{repository.owner}} /
-                        {{repository.name}} </a> <span>({{repository.language}})</span>
-                    <p>{{repository.description}}</p></li>
+                <li ng-repeat="commit in commits" ng-class-even="'even'" ng-class-odd="'odd'">
+                    {{commit.sha}} / {{commits[$index-1].sha}}
             </ul>
         </div>
     </div>

@@ -81,9 +81,9 @@ function RepositoryStatsCommitCtrl($scope, $rootScope, $routeParams,$location, $
 			deletions.push(stats[i].impacts.deletions);
 		}
 		Raphael("commits", 700, 700).pieChart(350, 350, 200, commits, labels, "#fff");
-			Raphael("additions", 700, 700).pieChart(350, 350, 200, additions, labels, "#fff");
-			Raphael("deletions", 700, 700).pieChart(350, 350, 200, deletions, labels, "#fff");
-		
+		Raphael("additions", 700, 700).pieChart(350, 350, 200, additions, labels, "#fff");
+		Raphael("deletions", 700, 700).pieChart(350, 350, 200, deletions, labels, "#fff");
+		$('#loading').modal('hide');
 	});
 	$('#sidenav').affix();
 }

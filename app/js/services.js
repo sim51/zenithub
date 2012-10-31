@@ -94,7 +94,6 @@ angular.module('github', [ ])
                 var url = playurl + '/repo/' + owner + '/' + repo  + '/commits/stats?callback=JSON_CALLBACK';
                 return $http.jsonp( url )
                     .then(function (response){
-                        $('#loading').modal('hide');
                         if( response.status == 200 ){
                             return response.data;
                         }else{
