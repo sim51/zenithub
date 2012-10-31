@@ -80,6 +80,13 @@ function RepositoryStatsCommitCtrl($scope, $rootScope, $routeParams,$location, $
 			additions.push(stats[i].impacts.additions);
 			deletions.push(stats[i].impacts.deletions);
 		}
+		// a little patch or raphealjs when there is only one commiter
+		if(i==1){
+			labels.push("");
+			commits.push(0.0001);
+			additions.push(0.0001);
+			deletions.push(0.0001);
+		}
 		Raphael("commits", 700, 700).pieChart(350, 350, 200, commits, labels, "#fff");
 		Raphael("additions", 700, 700).pieChart(350, 350, 200, additions, labels, "#fff");
 		Raphael("deletions", 700, 700).pieChart(350, 350, 200, deletions, labels, "#fff");
