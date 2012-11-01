@@ -6,7 +6,7 @@ var playurl = 'http://api.zenithub.logisima.com';
 /* Services */
 angular.module('github', [ ])
     /* Github service*/
-    .factory('$github', function($http, $location){
+    .factory('$github', function($http, $location, $rootScope){
         return {
             search:function(keyword){
                 $('#loading').modal('show');
@@ -17,6 +17,7 @@ angular.module('github', [ ])
                         if( response.status == 200 && response.data.meta.status == 200){
                             return response.data.data.repositories;
                         }else{
+                        	$rootScope.error = response.data.data.message;
                             $location.path('/error');
                         }
                     });
@@ -30,6 +31,7 @@ angular.module('github', [ ])
                         if( response.status == 200 && response.data.meta.status == 200){
                             return response.data.data;
                         }else{
+                        	$rootScope.error = response.data.data.message;
                             $location.path('/error');
                         }
                     });   
@@ -43,6 +45,7 @@ angular.module('github', [ ])
                         if( response.status == 200 && response.data.meta.status == 200){
                             return response.data.data;
                         }else{
+                        	$rootScope.error = response.data.data.message;
                             $location.path('/error');
                         }
                     });   
@@ -56,6 +59,7 @@ angular.module('github', [ ])
                         if( response.status == 200 && response.data.meta.status == 200){
                             return response.data.data;
                         }else{
+                        	$rootScope.error = response.data.data.message;
                             $location.path('/error');
                         }
                     });   
@@ -69,6 +73,7 @@ angular.module('github', [ ])
                         if( response.status == 200 && response.data.meta.status == 200){
                             return response.data.data;
                         }else{
+                        	$rootScope.error = response.data.data.message;
                             $location.path('/error');
                         }
                     });   
@@ -80,6 +85,7 @@ angular.module('github', [ ])
                         if( response.status == 200 && response.data.meta.status == 200){
                             return response.data.data;
                         }else{
+                        	$rootScope.error = response.data.data.message;
                             $location.path('/error');
                         }
                     });   
@@ -87,7 +93,7 @@ angular.module('github', [ ])
         }
     })
     /* Play service */
-    .factory('$play', function($http, $location){
+    .factory('$play', function($http, $location, $rootScope){
         return{
             stats:function(owner, repo){
                 $('#loading').modal('show');
@@ -97,6 +103,7 @@ angular.module('github', [ ])
                         if( response.status == 200 ){
                             return response.data;
                         }else{
+                        	$rootScope.error = response.data;
                             $location.path('/error');
                         }
                     });   
