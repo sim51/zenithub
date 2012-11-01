@@ -88,11 +88,9 @@ div.repository img{
 div.raphael{
 	margin-top: -100px;
 	height: 630px;
-	overflow:hidden;
 }
 svg{
 	display: block;
-	/*margin: 0 auto;*/
 }
 #legend{
 	top:150px;
