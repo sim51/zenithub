@@ -68,6 +68,7 @@ function RepositoryStatsCommitCtrl($scope, $rootScope, $routeParams,$location, $
 	var owner = $routeParams.owner;
 	var repo = $routeParams.repository;
 	$scope.repository = {owner:{login:owner}, name:repo};
+	$scope.colors = ["#ff0000","#ff9900","#ccff00","#32ff00","#00ff65","#00ffff","#0065ff","#3200ff","#cb00ff","#ff0099"];
 	$play.stats(owner, repo).then(function(response){
 		var stats = response;
 		var labels = [];
@@ -80,6 +81,7 @@ function RepositoryStatsCommitCtrl($scope, $rootScope, $routeParams,$location, $
 			additions.push(stats[i].impacts.additions);
 			deletions.push(stats[i].impacts.deletions);
 		}
+		$scope.labels = labels;
 		// a little patch or raphealjs when there is only one commiter
 		if(i==1){
 			labels.push("");
@@ -87,9 +89,9 @@ function RepositoryStatsCommitCtrl($scope, $rootScope, $routeParams,$location, $
 			additions.push(0.0001);
 			deletions.push(0.0001);
 		}
-		Raphael("commits", 700, 700).pieChart(350, 350, 200, commits, labels, "#fff");
-		Raphael("additions", 700, 700).pieChart(350, 350, 200, additions, labels, "#fff");
-		Raphael("deletions", 700, 700).pieChart(350, 350, 200, deletions, labels, "#fff");
+		Raphael("commits", 600, 600).pieChart(350, 350, 200, commits, labels, "#fff");
+		Raphael("additions", 600, 600).pieChart(350, 350, 200, additions, labels, "#fff");
+		Raphael("deletions", 600, 600).pieChart(350, 350, 200, deletions, labels, "#fff");
 		$('#loading').modal('hide');
 	});
 	$('#sidenav').affix();

@@ -27,3 +27,11 @@
         </div>
     </div>
 </div>
+
+<div id="legend">
+    <ul>
+        <li ng-repeat="label in labels">
+            <i style="background-color:{{colors[$index%10]}}"></i><div>{{label}}</div>
+        </li>
+    </ul>
+</div>

@@ -92,5 +92,40 @@ div.raphael{
 }
 svg{
 	display: block;
-	margin: 0 auto;
+	/*margin: 0 auto;*/
+}
+#legend{
+	top:150px;
+	bottom:40px;
+	right:0px;
+    width:150px;
+	position:fixed;
+	overflow-y:auto;
+	background-color: #F5F5F5;
+    border: 1px solid #E3E3E3;
+    border-radius: 4px 4px 4px 4px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05) inset;
+    padding:10px; 
+}
+#legend ul{
+	margin:0;
+    padding:0;
+}
+#legend ul li {
+	list-style: none;
+	clear:both;
+}
+#legend ul li i{
+	display:block;
+	float:left;
+	width:20px;
+	height:20px;
+}
+#legend ul li div{
+	display:block;
+	float:left;
+	margin-left: 2px;
+}
+svg *{
+	z-index: 9999;
 }
