@@ -35,10 +35,17 @@ h2{
 	font-weight: normal;
 	border-bottom: 1px solid #DDDDDD;
 }
+.content h4{
+	border-bottom: 1px solid #DDDDDD;
+	font-weight:normal;
+}
+.content h5{
+	margin:0;
+}
 #sidenav {
 	margin-right:0px;
 }
-ul.repositories{
+ul.unstyle{
 	list-style:none;
 }
 ul.repositories li {

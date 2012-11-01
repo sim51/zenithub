@@ -18,11 +18,30 @@
             </div>
         </div>
         <div class="span10">
-            <h3>Last 100 commits</h3>
-            <ul class="commits">
-                <li ng-repeat="commit in commits" ng-class-even="'even'" ng-class-odd="'odd'">
-                    {{commit.sha}} / {{commits[$index-1].sha}}
-            </ul>
+            <div class="commits">
+                <div ng-repeat="commit in commits">
+                    <h4 ng-show="formatDate(commit.commit.author.date) != formatDate(commits[$index-1].commit.author.date)">{{formatDate(commit.commit.author.date)}}</h4>
+                    <div class="commit row-fluid">
+                      <div class="span1 offset1"> 
+                        <a ng-click="popupMember(commit.committer.login)" title="{{commit.committer.login}}">
+                            <img ng-src="{{commit.committer.avatar_url}}" alt="{{commit.committer.login}}" />
+                        </a>
+                      </div>
+                      <div class="info span10">
+                        <h5>{{commit.commit.message}}</h5>
+                        <ul class="unstyle">
+                            <li>
+                                <strong>sha :</strong>
+                                <a href="http://github.com/{{repository.owner.login}}/{{repository.name}}/commit/{{commit.sha}}" title="Commit {{commit.sha}}">
+                                    {{commit.sha}}
+                                </a>
+                             </li>
+                            <li><strong>date :</strong>{{commit.commit.author.date}}</li>
+                        </ul>
+                      </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

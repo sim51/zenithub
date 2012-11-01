@@ -1,7 +1,12 @@
 <div id="legend">
     <ul>
         <li ng-repeat="label in labels">
-            <i style="background-color:{{colors[$index%10]}}"></i><div>{{label}}</div>
+            <i style="background-color:{{colors[$index%10]}}"></i>
+            <div>
+                <a ng-click="popupMember(label)" title="{{label}}">
+                    {{label}}
+                </a>
+            </div>
         </li>
     </ul>
 </div>

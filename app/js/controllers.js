@@ -39,12 +39,6 @@ function RepositoryMembersCtrl($scope, $rootScope, $routeParams, $location, $git
 	$github.contributors(owner, repo).then(function(response){
 		$scope.contributors = response;
 	});
-	$scope.popupMember = function (member){
-		$github.user(member.login).then(function(response){
-			$scope.user = response;
-			$('#member').modal('show');
-		});
-	};
 	$('#sidenav').affix();
 }
 

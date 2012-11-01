@@ -20,7 +20,9 @@
         <div class="span10">
             <div class="row-fluid">
                 <div class="span2">
-                    <img ng-src="{{repository.owner.avatar_url}}" />
+                    <a ng-click="popupMember(repository.owner.login)" title="{{repository.owner.login}}">
+                        <img ng-src="{{repository.owner.avatar_url}}" />
+                    </a>
                 </div>
                 <div class="span10">
                     <p ng-show="repository.description">{{repository.description}}</p>

@@ -14,9 +14,19 @@ app.config(function($routeProvider) {
 	      	.otherwise({redirectTo: '/search/'});
 	});
 
-app.run(function($rootScope, $location){
+app.run(function($rootScope, $github, $location){
 	$rootScope.searchRepository = function() {
 		var keyword = $rootScope.q;
 		$location.path('/search/'+ keyword);
 	}
+	$rootScope.formatDate = function( date1 ) {
+		var date = new Date(Date.parse( date1 ));
+		return date.toDateString();
+	}
+	$rootScope.popupMember = function (login){
+		$github.user(login).then(function(response){
+			$rootScope.user = response;
+			$('#member').modal('show');
+		});
+	};
 });
