@@ -1,7 +1,9 @@
 'use strict';
 
 var githuburl = 'https://api.github.com';
+var githubauth = '&client_id=a1dcf75e52345010831e&client_secret=a4d75e3931d282f2ec53f077c5fb7ac406171e24'
 var playurl = 'http://api.zenithub.logisima.com';
+var nominatimurl = 'http://nominatim.openstreetmap.org';
 
 /* Services */
 angular.module('github', [ ])
@@ -10,7 +12,7 @@ angular.module('github', [ ])
         return {
             search:function(keyword){
                 $('#loading').modal('show');
-                var url = githuburl + '/legacy/repos/search/' + keyword + '?callback=JSON_CALLBACK';
+                var url = githuburl + '/legacy/repos/search/' + keyword + '?callback=JSON_CALLBACK' + githubauth;
                 return $http.jsonp( url, {cache:true} )
                     .then(function (response){
                         $('#loading').modal('hide');
@@ -24,7 +26,7 @@ angular.module('github', [ ])
             },
             repo:function(owner, repo){
                 $('#loading').modal('show');
-                var url = githuburl + '/repos/' + owner + '/' + repo  + '?callback=JSON_CALLBACK';
+                var url = githuburl + '/repos/' + owner + '/' + repo  + '?callback=JSON_CALLBACK' + githubauth;
                 return $http.jsonp( url, {cache:true} )
                     .then(function (response){
                         $('#loading').modal('hide');
@@ -38,7 +40,7 @@ angular.module('github', [ ])
             },
             commits:function(owner, repo){
                 $('#loading').modal('show');
-                var url = githuburl + '/repos/' + owner + '/' + repo  + '/commits?per_page=100&callback=JSON_CALLBACK';
+                var url = githuburl + '/repos/' + owner + '/' + repo  + '/commits?per_page=100&callback=JSON_CALLBACK' + githubauth;
                 return $http.jsonp( url, {cache:true} )
                     .then(function (response){
                         $('#loading').modal('hide');
@@ -52,7 +54,7 @@ angular.module('github', [ ])
             },
             members:function(owner, repo){
                 $('#loading').modal('show');
-                var url = githuburl + '/repos/' + owner + '/' + repo  + '/collaborators?callback=JSON_CALLBACK';
+                var url = githuburl + '/repos/' + owner + '/' + repo  + '/collaborators?callback=JSON_CALLBACK' + githubauth;
                 return $http.jsonp( url, {cache:true} )
                     .then(function (response){
                         $('#loading').modal('hide');
@@ -66,7 +68,7 @@ angular.module('github', [ ])
             },
             contributors:function(owner, repo){
                 $('#loading').modal('show');
-                var url = githuburl + '/repos/' + owner + '/' + repo  + '/contributors?callback=JSON_CALLBACK';
+                var url = githuburl + '/repos/' + owner + '/' + repo  + '/contributors?callback=JSON_CALLBACK' + githubauth;
                 return $http.jsonp( url, {cache:true} )
                     .then(function (response){
                         $('#loading').modal('hide');
@@ -79,7 +81,7 @@ angular.module('github', [ ])
                     });   
             },
             user:function(login){
-                var url = githuburl + '/users/' + login  + '?callback=JSON_CALLBACK';
+                var url = githuburl + '/users/' + login  + '?callback=JSON_CALLBACK' + githubauth;
                 return $http.jsonp( url, {cache:true} )
                     .then(function (response){
                         if( response.status == 200 && response.data.meta.status == 200){
@@ -104,6 +106,23 @@ angular.module('github', [ ])
                             return response.data;
                         }else{
                         	$rootScope.error = response.data;
+                            $location.path('/error');
+                        }
+                    });   
+            }
+        }
+    })
+    /* nominatim service */
+    .factory('$nominatim', function($http, $location, $rootScope){
+        return{
+            locate:function(location){
+                var url = nominatimurl + '/search?q=' + location + '&format=json&json_callback=JSON_CALLBACK';
+                return $http.jsonp( url )
+                    .then(function (response){
+                        if( response.status == 200 ){
+                            return response.data;
+                        }else{
+                            $rootScope.error = response.data;
                             $location.path('/error');
                         }
                     });   

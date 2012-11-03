@@ -2,9 +2,9 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-GET     /repo/{owner}/{repo}/commits/stats				Application.impact
-GET     /repo/{owner}/{repo}/members/map				Application.map
-GET     /repo/{owner}/{repo}/similar			Application.similar
+GET     /repo/{owner}/{repo}/commits/stats				CommitsStats.index
+GET     /repo/{owner}/{repo}/members/map				RepoMap.index
+#GET     /repo/{owner}/{repo}/similar			        RepoSimilar.index
 
 # Ignore favicon requests
 GET     /favicon.ico                            404

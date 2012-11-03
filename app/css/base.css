@@ -134,3 +134,11 @@ svg{
 svg *{
 	z-index: 9999;
 }
+div#map{
+	margin:0;
+	padding:0;
+	z-index:0;
+	height: 500px;
+	background-color:#B5D0D0;
+	cursor: pointer;
+}

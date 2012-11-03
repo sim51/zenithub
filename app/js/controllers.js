@@ -94,8 +94,35 @@ function RepositoryStatsCommitCtrl($scope, $rootScope, $routeParams,$location, $
 /* 
  *  Repository geo stats (/repo/:owner/:repo/stats/geo).
  */
-function RepositoryStatsGeoCtrl($scope, $rootScope, $routeParams,$location, $play) {
-	$('#sidenav').affix();
+function RepositoryStatsGeoCtrl($scope, $rootScope, $routeParams, $location, $github, $nominatim) {
+	var owner = $routeParams.owner;
+	var repo = $routeParams.repository;
+	$scope.repository = {owner:{login:owner}, name:repo};
+	// initialize the map on the "map" div
+    var map = new L.Map('map');
+    // create a CloudMade tile layer with style #997 (or use other provider of your choice)
+    var cloudmade = new L.TileLayer('http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png', {
+        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
+        maxZoom: 17
+    });
+    // add the layer to the map, set the view to a given place and zoom
+    map.addLayer(cloudmade).setView(new L.LatLng(0, 0), 1);
+    // setup the clustering
+    var markers = new L.MarkerClusterGroup();
+    map.addLayer(markers);
+
+    // Calling 
+	$github.contributors(owner, repo).then(function(response){
+		for (var i=0; i<response.length; i++) {
+			$github.user(response[i].login).then(function(response){
+				$nominatim.locate(response.location).then(function(locationResp){
+					var markerLocation = new L.LatLng(locationResp[0].lat,locationResp[0].lon);
+			        var marker = new L.Marker(markerLocation);
+			        markers.addLayer(marker);
+				})	
+			})
+	    }
+	});
 }
 
 /*
