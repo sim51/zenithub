@@ -79,8 +79,8 @@
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
         <h3>{{user.login}}</h3>
       </div>
-      <div class="modal-body">
-        <div class="row-fluid user ng-cloak">
+      <div class="modal-body user">
+        <div class="row-fluid ng-cloak">
           <div class="span2"> 
             <img ng-src="{{user.avatar_url}}" alt="{{user.login}}" />
           </div>
@@ -90,10 +90,12 @@
               <li ng-show="user.email"><strong>Mail :</strong><a href="mailto:{{user.email}}" title="Send a email to {{user.name}}">{{user.email}}</a></li>
               <li ng-show="user.blog"><strong>Website :</strong><a href="{{user.blog}}" title="Website of {{user.name}}">{{user.blog}}</a></li>
               <li ng-show="user.location"><strong>Location :</strong>{{user.location}}</li>
+              <li ng-show="commitsTxt"><strong>Commit : </strong>{{commitsTxt}}</li>
+              <li ng-show="additionsTxt"><strong>Additions : </strong>{{additionsTxt}}</li>
+              <li ng-show="deletionsTxt"><strong>Deletions : </strong>{{deletionsTxt}}</li>
             </ul>
           </div>
         </div>
-      </div>
       <div class="modal-footer">
       </div>
     </div>

@@ -3,7 +3,7 @@
         <li ng-repeat="label in labels">
             <i style="background-color:{{colors[$index%10]}}"></i>
             <div>
-                <a ng-click="popupMember(label)" title="{{label}}">
+                <a ng-click="popupMember(label, commits, additions, deletions, $index)" title="{{label}}">
                     {{label}}
                 </a>
             </div>

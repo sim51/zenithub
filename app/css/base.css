@@ -89,6 +89,9 @@ div.repository img{
 #member .user div.info ul li strong{
 	width:100px;
 }
+member .user  ul.stats li strong{
+	width:100px;
+}
 #member .user div.info ul li{
 	clear:both;
 }

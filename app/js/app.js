@@ -24,9 +24,22 @@ app.run(function($rootScope, $github, $location){
 		var date = new Date(Date.parse( date1 ));
 		return date.toDateString();
 	}
-	$rootScope.popupMember = function (login){
+	$rootScope.popupMember = function (login, commits, additions, deletions, index){
 		$github.user(login).then(function(response){
 			$rootScope.user = response;
+			if(index){
+				$rootScope.commitsTxt = commits[index] + '/' + 100;
+				var addTt = 0;
+				for (var j=0; j<additions.length; j++){
+					addTt += additions[j];
+				}
+				$rootScope.additionsTxt = Math.round(additions[index]/addTt*100*100)/100 + '% (' + additions[index] + '/' + addTt + ')';
+				var delTt = 0
+				for (var j=0; j<deletions.length; j++){
+					delTt += deletions[j];
+				}
+				$rootScope.deletionsTxt = Math.round(deletions[index]/delTt*100*100)/100 + '% (' + deletions[index] + '/' + delTt + ')';
+			}
 			$('#member').modal('show');
 		});
 	};
