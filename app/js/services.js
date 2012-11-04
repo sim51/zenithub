@@ -1,7 +1,6 @@
 'use strict';
 
 var githuburl = 'http://api.zenithub.logisima.com';
-var playurl = 'http://api.zenithub.logisima.com';
 var nominatimurl = 'http://nominatim.openstreetmap.org';
 
 /* Services */

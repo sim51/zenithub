@@ -97,6 +97,7 @@ function RepositoryStatsCommitCtrl($scope, $rootScope, $routeParams,$location, $
 			}
 		}
 	});
+	$('#sidenav').affix();
 }
 
 /* 
@@ -137,6 +138,7 @@ function RepositoryStatsGeoCtrl($scope, $rootScope, $routeParams, $location, $gi
 			}
 	    }
 	});
+	$('#sidenav').affix();
 }
 
 /*
