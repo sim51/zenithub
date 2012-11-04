@@ -38,7 +38,19 @@ angular.module('github', [ ])
                         }
                     });   
             },
-            commits:function(owner, repo){
+            commit:function(owner, repo, sha){
+                var url = githuburl + '/repos/' + owner + '/' + repo  + '/commits/' + sha + '?per_page=100&callback=JSON_CALLBACK' + githubauth;
+                return $http.jsonp( url, {cache:true} )
+                    .then(function (response){
+                        if( response.status == 200 && response.data.meta.status == 200){
+                            return response.data.data;
+                        }else{
+                        	$rootScope.error = response.data.data.message;
+                            $location.path('/error');
+                        }
+                    });   
+            },
+            commits:function(owner, repo, sha){
                 $('#loading').modal('show');
                 var url = githuburl + '/repos/' + owner + '/' + repo  + '/commits?per_page=100&callback=JSON_CALLBACK' + githubauth;
                 return $http.jsonp( url, {cache:true} )
@@ -47,7 +59,7 @@ angular.module('github', [ ])
                         if( response.status == 200 && response.data.meta.status == 200){
                             return response.data.data;
                         }else{
-                        	$rootScope.error = response.data.data.message;
+                            $rootScope.error = response.data.data.message;
                             $location.path('/error');
                         }
                     });   

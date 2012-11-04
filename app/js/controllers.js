@@ -58,37 +58,45 @@ function RepositoryCommitsCtrl($scope, $rootScope, $routeParams,$location, $gith
 /* 
  *	Repository commits stats(/repo/:owner/:repo/stats/commit).
  */
-function RepositoryStatsCommitCtrl($scope, $rootScope, $routeParams,$location, $play) {
+function RepositoryStatsCommitCtrl($scope, $rootScope, $routeParams,$location, $github) {
 	var owner = $routeParams.owner;
 	var repo = $routeParams.repository;
 	$scope.repository = {owner:{login:owner}, name:repo};
 	$scope.colors = ["#ff0000","#ff9900","#ccff00","#32ff00","#00ff65","#00ffff","#0065ff","#3200ff","#cb00ff","#ff0099"];
-	$play.stats(owner, repo).then(function(response){
-		var stats = response;
-		var labels = [];
-		var commits= [];
-		var additions= [];
-		var deletions= [];
-		for (var i=0; i<stats.length; i++) {
-			labels.push(stats[i].author.login);
-			commits.push(stats[i].impacts.commits);
-			additions.push(stats[i].impacts.additions);
-			deletions.push(stats[i].impacts.deletions);
+	$scope.labels = [];
+	$scope.commits= [];
+	$scope.additions= [];
+	$scope.deletions= [];
+	$github.commits(owner, repo).then(function(response){
+		var commitHistory = response;
+		for (var i=0; i<commitHistory.length; i++) {
+			if(commitHistory[i].author && commitHistory[i].author.login){
+				if($scope.labels.indexOf(commitHistory[i].author.login) == -1){
+					$scope.labels.push(commitHistory[i].author.login);
+					var index = $scope.labels.indexOf(commitHistory[i].author.login);
+					$scope.commits[index] = 0;
+					$scope.additions[index] = 0;
+					$scope.deletions[index] = 0;
+				}
+				$github.commit(owner, repo, commitHistory[i].sha).then(function(response){
+					var loginIndex = $scope.labels.indexOf(response.author.login);
+					// commit stats
+					var nbCommit = $scope.commits[loginIndex];
+					nbCommit += 1;
+					$scope.commits[loginIndex] = nbCommit;
+					// deletion stats
+					var nbAddition = $scope.additions[loginIndex];
+					nbAddition += response.stats.additions;
+					$scope.additions[loginIndex] = nbAddition;
+					// addition stats
+					var nbDeletion = $scope.deletions[loginIndex];
+					nbDeletion += response.stats.deletions;
+					$scope.deletions[loginIndex] = nbDeletion;
+				});
+
+			}
 		}
-		$scope.labels = labels;
-		// a little patch or raphealjs when there is only one commiter
-		if(i==1){
-			labels.push("");
-			commits.push(0.0001);
-			additions.push(0.0001);
-			deletions.push(0.0001);
-		}
-		Raphael("commits", 700, 700).pieChart(350, 350, 200, commits, labels, "#fff");
-		Raphael("additions", 700, 700).pieChart(350, 350, 200, additions, labels, "#fff");
-		Raphael("deletions", 700, 700).pieChart(350, 350, 200, deletions, labels, "#fff");
-		$('#loading').modal('hide');
 	});
-	$('#sidenav').affix();
 }
 
 /* 
@@ -114,13 +122,19 @@ function RepositoryStatsGeoCtrl($scope, $rootScope, $routeParams, $location, $gi
     // Calling 
 	$github.contributors(owner, repo).then(function(response){
 		for (var i=0; i<response.length; i++) {
-			$github.user(response[i].login).then(function(response){
-				$nominatim.locate(response.location).then(function(locationResp){
-					var markerLocation = new L.LatLng(locationResp[0].lat,locationResp[0].lon);
-			        var marker = new L.Marker(markerLocation);
-			        markers.addLayer(marker);
-				})	
-			})
+			if(response[i].login){
+				$github.user(response[i].login).then(function(response){
+					if(response.location){
+						$nominatim.locate(response.location).then(function(locationResp){
+							if(locationResp[0]){
+								var markerLocation = new L.LatLng(locationResp[0].lat,locationResp[0].lon);
+						        var marker = new L.Marker(markerLocation);
+						        markers.addLayer(marker);
+						    }
+						})
+					}
+				})
+			}
 	    }
 	});
 }

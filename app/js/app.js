@@ -1,7 +1,7 @@
 'use strict';
 
 /* App Module */
-var app = angular.module('zenithub', ['github']);
+var app = angular.module('zenithub', ['github', 'AwesomeChartJS']);
 
 app.config(function($routeProvider) {
 		$routeProvider
