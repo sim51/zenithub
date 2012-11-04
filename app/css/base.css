@@ -119,6 +119,7 @@ svg{
 #legend ul li {
 	list-style: none;
 	clear:both;
+	padding: 1px 0;
 }
 #legend ul li i{
 	display:block;
