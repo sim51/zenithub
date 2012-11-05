@@ -27,7 +27,7 @@ app.run(function($rootScope, $github, $location){
 	$rootScope.popupMember = function (login, commits, additions, deletions, index){
 		$github.user(login).then(function(response){
 			$rootScope.user = response;
-			if(index){
+			if(index >= 0){
 				$rootScope.commitsTxt = commits[index] + '/' + 100;
 				var addTt = 0;
 				for (var j=0; j<additions.length; j++){
