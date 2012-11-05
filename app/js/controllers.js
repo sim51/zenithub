@@ -62,7 +62,7 @@ function RepositoryStatsCommitCtrl($scope, $rootScope, $routeParams,$location, $
 	var owner = $routeParams.owner;
 	var repo = $routeParams.repository;
 	$scope.repository = {owner:{login:owner}, name:repo};
-	$scope.colors = ["#ff0000","#ff9900","#ccff00","#32ff00","#00ff65","#00ffff","#0065ff","#3200ff","#cb00ff","#ff0099"];
+	$scope.colors = ["#ff0000","#ff9900","#ccff00","#32ff00","#58E3AD","#00ffff","#4598FF","#2D00D4","#cb00ff","#ff0099"];
 	$scope.labels = [];
 	$scope.commits= [];
 	$scope.additions= [];
