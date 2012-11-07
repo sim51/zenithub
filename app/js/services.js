@@ -9,11 +9,9 @@ angular.module('github', [ ])
     .factory('$github', function($http, $location, $rootScope){
         return {
             search:function(keyword){
-                $('#loading').modal('show');
                 var url = githuburl + '/legacy/repos/search/' + keyword + '?callback=JSON_CALLBACK';
                 return $http.jsonp( url, {cache:true} )
                     .then(function (response){
-                        $('#loading').modal('hide');
                         if( response.status == 200 && response.data.meta.status == 200){
                             return response.data.data.repositories;
                         }else{
@@ -23,11 +21,9 @@ angular.module('github', [ ])
                     });
             },
             repo:function(owner, repo){
-                $('#loading').modal('show');
                 var url = githuburl + '/repos/' + owner + '/' + repo  + '?callback=JSON_CALLBACK';
                 return $http.jsonp( url, {cache:true} )
                     .then(function (response){
-                        $('#loading').modal('hide');
                         if( response.status == 200 && response.data.meta.status == 200){
                             return response.data.data;
                         }else{
@@ -49,11 +45,9 @@ angular.module('github', [ ])
                     });   
             },
             commits:function(owner, repo, sha){
-                $('#loading').modal('show');
                 var url = githuburl + '/repos/' + owner + '/' + repo  + '/commits?per_page=100&callback=JSON_CALLBACK';
                 return $http.jsonp( url, {cache:true} )
                     .then(function (response){
-                        $('#loading').modal('hide');
                         if( response.status == 200 && response.data.meta.status == 200){
                             return response.data.data;
                         }else{
@@ -63,11 +57,9 @@ angular.module('github', [ ])
                     });   
             },
             members:function(owner, repo){
-                $('#loading').modal('show');
                 var url = githuburl + '/repos/' + owner + '/' + repo  + '/collaborators?callback=JSON_CALLBACK';
                 return $http.jsonp( url, {cache:true} )
                     .then(function (response){
-                        $('#loading').modal('hide');
                         if( response.status == 200 && response.data.meta.status == 200){
                             return response.data.data;
                         }else{
@@ -77,11 +69,9 @@ angular.module('github', [ ])
                     });   
             },
             contributors:function(owner, repo){
-                $('#loading').modal('show');
                 var url = githuburl + '/repos/' + owner + '/' + repo  + '/contributors?callback=JSON_CALLBACK';
                 return $http.jsonp( url, {cache:true} )
                     .then(function (response){
-                        $('#loading').modal('hide');
                         if( response.status == 200 && response.data.meta.status == 200){
                             return response.data.data;
                         }else{
@@ -98,24 +88,6 @@ angular.module('github', [ ])
                             return response.data.data;
                         }else{
                         	$rootScope.error = response.data.data.message;
-                            $location.path('/error');
-                        }
-                    });   
-            }
-        }
-    })
-    /* Play service */
-    .factory('$play', function($http, $location, $rootScope){
-        return{
-            stats:function(owner, repo){
-                $('#loading').modal('show');
-                var url = playurl + '/repo/' + owner + '/' + repo  + '/commits/stats?callback=JSON_CALLBACK';
-                return $http.jsonp( url )
-                    .then(function (response){
-                        if( response.status == 200 ){
-                            return response.data;
-                        }else{
-                        	$rootScope.error = response.data;
                             $location.path('/error');
                         }
                     });   

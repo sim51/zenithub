@@ -42,6 +42,12 @@ h2{
 .content h5{
 	margin:0;
 }
+#loading{
+	background-color: #FFFFFF;
+    position: fixed;
+    top: 40px;
+    left: 23px;
+}
 #sidenav {
 	margin-right:0px;
 }
@@ -95,12 +101,8 @@ member .user  ul.stats li strong{
 #member .user div.info ul li{
 	clear:both;
 }
-div.raphael{
-	margin-top: -100px;
-	height: 630px;
-}
-svg{
-	display: block;
+.commit.row-fluid {
+    margin: 5px 0;
 }
 #legend{
 	top:150px;

@@ -4,6 +4,7 @@
  *	Search a repository (/search/:keyword).
  */
 function RepositoryListCtrl($scope, $rootScope, $routeParams, $location, $github) {
+	$('#loading').show();
 	var keyword = $routeParams.keyword  || '';
 	$rootScope.keyword = keyword;
 	if( keyword != ''){
@@ -12,24 +13,28 @@ function RepositoryListCtrl($scope, $rootScope, $routeParams, $location, $github
 		});
 	}
 	$scope.orderProp = 'name';
+	$('#loading').hide();
 }
 
 /* 
  *	Repository general informations (/repo/:owner/:repo).
  */
 function RepositoryHomeCtrl($scope, $rootScope, $routeParams,$location, $github) {
+	$('#loading').show();
 	var owner = $routeParams.owner;
 	var repo = $routeParams.repository;
 	$github.repo(owner, repo).then(function(response){
 		$scope.repository = response;
 	});
     $('#sidenav').affix();
+    $('#loading').hide();
 }
 
 /* 
  *	Repository members informations (/repo/:owner/:repo/collaborators).
  */
 function RepositoryMembersCtrl($scope, $rootScope, $routeParams, $location, $github) {
+	$('#loading').show();
 	var owner = $routeParams.owner;
 	var repo = $routeParams.repository;
 	$scope.repository = {owner:{login:owner}, name:repo};
@@ -40,17 +45,20 @@ function RepositoryMembersCtrl($scope, $rootScope, $routeParams, $location, $git
 		$scope.contributors = response;
 	});
 	$('#sidenav').affix();
+	$('#loading').hide();
 }
 
 /* 
  *  Repository commits informations (/repo/:owner/:repo/commits).
  */
 function RepositoryCommitsCtrl($scope, $rootScope, $routeParams,$location, $github) {
+	$('#loading').show();
 	var owner = $routeParams.owner;
 	var repo = $routeParams.repository;
 	$scope.repository = {owner:{login:owner}, name:repo};
 	$github.commits(owner, repo).then(function(response){
 		$scope.commits = response;
+		$('#loading').hide();
 	});
 	$('#sidenav').affix();
 }
@@ -59,6 +67,7 @@ function RepositoryCommitsCtrl($scope, $rootScope, $routeParams,$location, $gith
  *	Repository commits stats(/repo/:owner/:repo/stats/commit).
  */
 function RepositoryStatsCommitCtrl($scope, $rootScope, $routeParams,$location, $github) {
+	$('#loading').show();
 	var owner = $routeParams.owner;
 	var repo = $routeParams.repository;
 	$scope.repository = {owner:{login:owner}, name:repo};
@@ -68,12 +77,12 @@ function RepositoryStatsCommitCtrl($scope, $rootScope, $routeParams,$location, $
 	$scope.additions= [];
 	$scope.deletions= [];
 	$github.commits(owner, repo).then(function(response){
-		var commitHistory = response;
-		for (var i=0; i<commitHistory.length; i++) {
-			if(commitHistory[i].author && commitHistory[i].author.login){
-				var index = $scope.labels.indexOf(commitHistory[i].author.login);
+		$scope.commitHistory = response;
+		for (var i=0; i<$scope.commitHistory.length; i++) {
+			if($scope.commitHistory[i].author && $scope.commitHistory[i].author.login){
+				var index = $scope.labels.indexOf($scope.commitHistory[i].author.login);
 				if(index == -1){
-					$scope.labels.push(commitHistory[i].author.login);
+					$scope.labels.push($scope.commitHistory[i].author.login);
 					$scope.commits.push(1);
 					$scope.additions.push(0);
 					$scope.deletions.push(0);
@@ -84,7 +93,7 @@ function RepositoryStatsCommitCtrl($scope, $rootScope, $routeParams,$location, $
 					nbCommit += 1;
 					$scope.commits[index] = nbCommit;
 				}
-				$github.commit(owner, repo, commitHistory[i].sha).then(function(response){
+				$github.commit(owner, repo, $scope.commitHistory[i].sha).then(function(response){
 					var loginIndex = $scope.labels.indexOf(response.author.login);
 					// deletion stats
 					var nbAddition = $scope.additions[loginIndex];
@@ -94,6 +103,10 @@ function RepositoryStatsCommitCtrl($scope, $rootScope, $routeParams,$location, $
 					var nbDeletion = $scope.deletions[loginIndex];
 					nbDeletion += response.stats.deletions;
 					$scope.deletions[loginIndex] = nbDeletion;
+
+					if($scope.commitHistory[$scope.commitHistory.length-1].sha == response.sha){
+						$('#loading').hide();
+					}
 				});
 
 			}
@@ -106,6 +119,7 @@ function RepositoryStatsCommitCtrl($scope, $rootScope, $routeParams,$location, $
  *  Repository geo stats (/repo/:owner/:repo/stats/geo).
  */
 function RepositoryStatsGeoCtrl($scope, $rootScope, $routeParams, $location, $github, $nominatim) {
+	$('#loading').show();
 	var owner = $routeParams.owner;
 	var repo = $routeParams.repository;
 	$scope.repository = {owner:{login:owner}, name:repo};
@@ -124,17 +138,29 @@ function RepositoryStatsGeoCtrl($scope, $rootScope, $routeParams, $location, $gi
 
     // Calling 
 	$github.contributors(owner, repo).then(function(response){
-		for (var i=0; i<response.length; i++) {
+		// var to know when nominatim is done (hide spinner)
+		$scope.nbContrib = response.length; 
+		$scope.nbNominatim = 0;
+
+		for (var i=0; i<$scope.nbContrib; i++) {
 			if(response[i].login){
 				$github.user(response[i].login).then(function(response){
 					if(response.location){
 						$nominatim.locate(response.location).then(function(locationResp){
+							$scope.nbNominatim +=1;
 							if(locationResp[0]){
 								var markerLocation = new L.LatLng(locationResp[0].lat,locationResp[0].lon);
 						        var marker = new L.Marker(markerLocation);
 						        markers.addLayer(marker);
 						    }
+						    if($scope.nbNominatim == $scope.nbContrib){
+						    	$('#loading').hide();
+						    }
 						})
+					}
+					else{
+						// increment nbNomitatim anyway
+						$scope.nbNominatim +=1;
 					}
 				})
 			}
