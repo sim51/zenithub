@@ -48,7 +48,7 @@
               Search a github repository
             </label>
             <div>
-                <input id="search" ng-model="q" value="{{keyword}}">
+                <input id="search" value="{{keyword}}">
                 <button type="submit" class="btn" ><i class="icon-search"></i> Search</button>
              </div>
           </div>
@@ -60,7 +60,7 @@
   	 <div ng-view></div>
     </div>
 
-    <div id="loading" class="modal hide fade">
+    <div id="loading">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
         <h3>Loading...</h3>

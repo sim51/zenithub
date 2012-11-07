@@ -17,7 +17,7 @@ app.config(function($routeProvider) {
 
 app.run(function($rootScope, $github, $location){
 	$rootScope.searchRepository = function() {
-		var keyword = $rootScope.q;
+		var keyword = $rootScope.keyword;
 		$location.path('/search/'+ keyword);
 	}
 	$rootScope.formatDate = function( date1 ) {
