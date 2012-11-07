@@ -5,7 +5,7 @@
  */
 function RepositoryListCtrl($scope, $rootScope, $routeParams, $location, $github) {
 	var keyword = $routeParams.keyword  || '';
-	$scope.keyword = keyword;
+	$rootScope.keyword = keyword;
 	if( keyword != ''){
 		$github.search(keyword).then(function(response){
 			$scope.repositories = response;
@@ -71,19 +71,21 @@ function RepositoryStatsCommitCtrl($scope, $rootScope, $routeParams,$location, $
 		var commitHistory = response;
 		for (var i=0; i<commitHistory.length; i++) {
 			if(commitHistory[i].author && commitHistory[i].author.login){
-				if($scope.labels.indexOf(commitHistory[i].author.login) == -1){
+				var index = $scope.labels.indexOf(commitHistory[i].author.login);
+				if(index == -1){
 					$scope.labels.push(commitHistory[i].author.login);
-					var index = $scope.labels.indexOf(commitHistory[i].author.login);
-					$scope.commits[index] = 0;
-					$scope.additions[index] = 0;
-					$scope.deletions[index] = 0;
+					$scope.commits.push(1);
+					$scope.additions.push(0);
+					$scope.deletions.push(0);
+				}
+				else{
+					// commit stats
+					var nbCommit = $scope.commits[index];
+					nbCommit += 1;
+					$scope.commits[index] = nbCommit;
 				}
 				$github.commit(owner, repo, commitHistory[i].sha).then(function(response){
 					var loginIndex = $scope.labels.indexOf(response.author.login);
-					// commit stats
-					var nbCommit = $scope.commits[loginIndex];
-					nbCommit += 1;
-					$scope.commits[loginIndex] = nbCommit;
 					// deletion stats
 					var nbAddition = $scope.additions[loginIndex];
 					nbAddition += response.stats.additions;
