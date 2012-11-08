@@ -10,10 +10,10 @@ function RepositoryListCtrl($scope, $rootScope, $routeParams, $location, $github
 	if( keyword != ''){
 		$github.search(keyword).then(function(response){
 			$scope.repositories = response;
+			$('#loading').hide();
 		});
 	}
 	$scope.orderProp = 'name';
-	$('#loading').hide();
 }
 
 /* 
@@ -25,9 +25,9 @@ function RepositoryHomeCtrl($scope, $rootScope, $routeParams,$location, $github)
 	var repo = $routeParams.repository;
 	$github.repo(owner, repo).then(function(response){
 		$scope.repository = response;
+		$('#loading').hide();
 	});
     $('#sidenav').affix();
-    $('#loading').hide();
 }
 
 /* 
@@ -43,9 +43,9 @@ function RepositoryMembersCtrl($scope, $rootScope, $routeParams, $location, $git
 	});
 	$github.contributors(owner, repo).then(function(response){
 		$scope.contributors = response;
+		$('#loading').hide();
 	});
 	$('#sidenav').affix();
-	$('#loading').hide();
 }
 
 /* 
