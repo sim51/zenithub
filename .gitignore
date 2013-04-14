@@ -8,4 +8,12 @@ api/.classpath
 api/logs
 api/server.pid
 .project
-
+zenithub.h2.db
+zenithub.lock.db
+zenithub.trace.db
+logs/
+target/
+zenithub.iml
+zenithub.ipr
+zenithub.iws
+project/target
