@@ -1,0 +1,190 @@
+@colorPrimaryDark: #3D577A;
+@colorPrimaryLight: #677C97;
+@colorSecondary: #AEBD63;
+@colorTertiary: #8F2831;
+@colorBackground: #E3E6EB;
+@colorLight: #FFFFFF;
+@colorDark: #000000;
+
+html {
+  //height:100%;
+
+  body {
+
+    padding-top: 40px;
+    height: 100%;
+
+    .navbar-inverse .navbar-inner {
+
+      background-color: @colorPrimaryDark;
+      background-image: linear-gradient(to bottom, @colorDark, @colorPrimaryDark, @colorPrimaryLight);
+      background-image: -webkit-linear-gradient(to bottom, @colorDark, @colorPrimaryDark, @colorPrimaryLight);
+
+      a.brand {
+        color: #FFFFFF;
+      }
+
+      .nav > li > a {
+        color: @colorSecondary;
+      }
+      .nav > li > a:hover {
+        color: #FFFFFF;
+      }
+
+      .nav li.dropdown.open > .dropdown-toggle, .navbar-inverse .nav li.dropdown.active > .dropdown-toggle, .navbar-inverse .nav li.dropdown.open.active > .dropdown-toggle {
+        background-color: transparent;
+      }
+      #user-menu li > a.dropdown-toggle {
+        color: #FFFFFF;
+      }
+    }
+
+    h2 {
+      text-align: center;
+    }
+    a i {
+      cursor: pointer;
+    }
+
+    #user-menu {
+      float: right;
+      .dropdown {
+        .dropdown-toggle {
+          img {
+            max-width: 25px;
+          }
+        }
+      }
+    }
+
+    .alert {
+
+      h4 {
+        display: inline;
+      }
+
+    }
+    #save {
+      position: absolute;
+      top: 0;
+      left: 33%;
+      width: 33%;
+      z-index: 9999;
+    }
+
+    #content {
+      background-color: #FFFFFF;
+      border-radius: 0 0 6px 6px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+      margin: -20px auto 0px;
+      padding: 0;
+      padding-top: 20px;
+      height: 95%;
+      overflow-y: auto;
+
+      #innercontent {
+        padding-left: 20px;
+        padding-right: 20px;
+
+        .hero-unit {
+          background-color: @colorBackground;
+        }
+
+        td.action a {
+          text-decoration: none;
+        }
+
+      }
+
+      > div {
+        height: 100%;
+      }
+
+      .hero-unit h1 {
+        font-size: 50px;
+        margin-bottom: 30px;
+      }
+
+      textarea.boxEdit {
+        width: 100%;
+      }
+
+      div#colLeft {
+        width: 50%;
+        height: 99%;
+        float: left;
+        .codeArea {
+          height: 50%;
+          div.CodeMirror {
+            height: 100%;
+          }
+          border: 1px solid #FFFFFF;
+        }
+
+      }
+
+      div#colRight {
+        width: 50%;
+        height: 99%;
+        float: right;
+
+        iframe {
+          width: 100%;
+          height: 100%;
+        }
+      }
+
+      #contact {
+        background: url("/assets/images/letter2.png") no-repeat 20px bottom;
+      }
+
+      #stackTech .span4 > img {
+        max-height: 200px;
+        display: block;
+      }
+
+      #home {
+        background-color: @colorPrimaryLight;
+        color: @colorLight;
+        border-radius: 6px 6px 6px 6px;
+        padding: 10px;
+        margin-bottom: 20px;
+
+        img {
+          width: 80%;
+          display: block;
+          margin: 0 auto;
+        }
+      }
+
+      form {
+
+        .input-xxlarge {
+          width: 100%;
+        }
+
+      }
+    }
+
+    footer {
+      background-color: @colorPrimaryDark;
+      background-image: linear-gradient(to bottom, @colorPrimaryLight, @colorPrimaryDark, @colorDark);
+      background-image: -webkit-linear-gradient(to bottom, @colorPrimaryLight, @colorPrimaryDark, @colorDark);
+      color: #FFFFFF;
+
+      a {
+        color: #FFFFFF;
+        text-decoration: underline;
+        cursor: pointer;
+      }
+      a:hover {
+        color: @colorSecondary;
+      }
+
+      * {
+        text-align: center;
+      }
+    }
+
+  }
+}

@@ -1,0 +1,79 @@
+# COMMON
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+application.name=Hype
+application.baseline=Html yoda presentation experience
+footer.text=<p>Ce projet est sous la <a href\="http\://www.gnu.org/licenses/gpl.html" title\="Licence GPL" target\="_blank">GNU General Public Licence (GPL)</a>. Les sources sont hébergées sur <a href\="https\://github.com/sim51/hype" target\="_blank">github</a>.<br>&copy; <a href\="http\://www.bsimard.com">Benoit SImard</a></p>
+common.search=Rechercher
+common.previous=Précédent
+common.next=Suivant
+common.page=Page n°
+common.login=Se connecter
+common.logout=Se d\u00E9connecter
+
+# PAGE HOME
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+page.home=Home
+page.home.title=Html yoda presentation experience
+page.home.text=<p>Hype est un outil vous permettant de créer une présentation avec Reveal.js directement en ligne.</p><p>Créer une présentation simplement via un formulaire, et commencer à travailler immédiatement grâce à une interface à la JSFiddle.</p><p>Vous restez maitre de vos données, tout est enregistré sur votre compte Github en tant que Gist.  Et n'oubliez pas, les gists sont versionnés !</p><p>Le plus de la solution est que vous pouvez donner accès à vos slides pour une conférence, où vous êtes le seul à pouvoir changer les slides. Plus pratique encore vous pouvez utiliser votre téléphone comme télécommande !<br/> Ceci est possible grâce à la technologie des websockets.</p><br/><p><a class="btn btn-primary btn-large" href="/authenticate/github">Connecter vous !</a></p>
+page.home.col1.title=L'éditeur en ligne
+page.home.col1.text=<div class="row-fluid"><p>Créer / Modifier vos présentations en ligne grâce à l'éditeur JSFiddle like.</p><p>D'un coté vous avez votre code HTML et CSS et de l'autre l'aperçu de votre présentation qui se met à jour en temps réel !<br/>Pas besoin de recharger la page ou d'appuyer sur "run" pour le résultat.</p><p>Pour enregistrer vos modifications un simple CTRL+S suffit comme sur vos éditeurs (l'implementation du ":w" est en cours ^^)</p></div><br/><div class="row-fluid"><img src="/assets/images/workspace.png" /></div>
+page.home.col2.title=La stack technique
+page.home.col2.text=<div class="row-fluid"><div class="span4"><img src="/assets/images/angular.jpeg" /><a href="http://www.angularjs.org" title="angular.js">AngularJS</a> est utilisé pour la partie front-end (single page application), et gère tous les appels ajax à l'API Github</div><div class="span4"><img src="/assets/images/play.png" /><a href="http://www.playframework.com" title="Play! framework">Play! framework 2.1</a> permet de gérer l'internationalisation de l'application, l'authentification à github et les webscokets.</div><div class="span4"><img src="/assets/images/github.png" /><a href="http://github.com">Github</a> est assimilé pour ce projet à un servive d'authentification, mais surtout comme datastore versionné.</div></div>
+
+# PAGE CONTACT
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+page.contact=Contact
+page.contact.text=<p>Si vous apprécier cette aplication, ou si vous avez trouvé un bug, que vous avez une idée d'évolution, ou tout simplement pour dire 'coucou', vous pouvez remplir ce formulaire de contact.<br/> N'hésitez pas !</p>
+page.contact.title=Contacter nous !
+page.contact.author=Votre nom
+page.contact.author.placeholder=Benoît Simard
+page.contact.mail=Votre email
+page.contact.mail.placeholder=bsimard@yopmail.com
+page.contact.message=Votre message
+page.contact.send=Envoyer !
+
+# MY PAGE
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+page.profile=Ma Page
+page.profile.title=Mon compte
+page.profile.presentations.title=Mes présentations
+page.profile.create.title=Créer une présentations
+page.profile.public=Public ?
+page.profile.name=Nom
+page.profile.description=Description
+page.profile.create=Créer !
+
+# PREZ
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+prez.name=Nom
+prez.description=Description
+prez.updated=Modifier le
+prez.created=Créer le
+prez.action.edit=Modifier la présentation
+prez.action.view=Consulter la présentation
+prez.action.run=Démarrer une présentation
+prez.action.readonly=Visionner la présentation (lecture seule)
+prez.action.github=Voir la présentation sur github
+
+# ERROR / SUCCESS / WARNING
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+error=Erreur
+success=Succès
+warning=Attention
+error.cause=La raison est :
+# sending email
+error.sendmail=Une erreur est survenue lors de l'envoie de l'email
+warning.sendmail=Vous avez 10 minutes pour remplir le formulaire :
+success.sendmail=Votre demande de contact a été envoyé.
+# create prez
+success.createprez=Votre présentation vient d'être créé.
+success.save=Sauvgarde effectuée.
+error.github=Une erreur est survenue avec l'API de Github
+
+# SECURE SOCIAL
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+page.login=Login
+securesocial.login.title=Login
+securesocial.login.instructions=Utilisez votre compte Github pour vous authentifier. Vous avez simplement à cliquer sur l'octocat ci-dessous.
+securesocial.login.accessDenied=Votre compte nous a refusé l'accès. S'il vous plait, modifier les paramètre pour nous donner accès.
+securesocial.login.errorLoggingIn=Une erreur est survenue lors de votre authentification. Vous pouvez réessayer.
