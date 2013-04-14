@@ -9,8 +9,10 @@
         <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
         <link href="//netdna.bootstrapcdn.com/font-awesome/3.0.2/css/font-awesome.css" rel="stylesheet">
         <link href="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.5.1/leaflet.min.css" rel="stylesheet">
-
+        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/base.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.at("javascripts/leaflet/MarkerCluster.css")">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.at("javascripts/leaflet/MarkerCluster.Default.css")">
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
     </head>
     <body data-offset="50" data-target=".subnav" data-spy="scroll">
@@ -25,9 +27,6 @@
                     <a href="/" class="brand">@Messages("application.name")</a>
                     <div class="nav-collapse collapse">
                         <ul class="nav">
-                            <li>
-                                <a href="/#/home">@Messages("page.home")</a>
-                            </li>
                         </ul>
                         <ul class="nav" id="user-menu">
                             @user match {
