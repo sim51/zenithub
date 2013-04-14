@@ -2,13 +2,14 @@
 @import play.api.Play
 @import play.api.Play.current
 <!DOCTYPE html>
-<html lang="@locale" ng-app="hype">
+<html lang="@locale" ng-app="zenithub">
     <head>
         <title>@title</title>
         <meta charset="utf-8">
         <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
         <link href="//netdna.bootstrapcdn.com/font-awesome/3.0.2/css/font-awesome.css" rel="stylesheet">
-        <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
+        <link href="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.5.1/leaflet.min.css" rel="stylesheet">
+
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
     </head>
@@ -52,6 +53,22 @@
             </div>
         </div>
 
+        <header class="jumbotron subhead">
+            <div class="container-fluid">
+                <form class="well form-search" ng-submit="searchRepository()">
+                    <div id="searchForm">
+                        <label class="control-label" for="search">
+                            Search a github repository
+                        </label>
+                        <div>
+                            <input id="search" ng-model="keyword">
+                            <button type="submit" class="btn" ><i class="icon-search"></i> Search</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </header>
+
         <div class="container-fluid" id="content">
             @content
         </div>
@@ -62,6 +79,33 @@
 
         <div id="loading" class="hide">
             <img src="@routes.Assets.at("images/spinner.gif")" alt="Laoding" /> Please wait, page is loading.
+        </div>
+
+        <div id="member" class="modal hide fade">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3>{{user.login}}</h3>
+            </div>
+            <div class="modal-body user">
+                <div class="row-fluid ng-cloak">
+                    <div class="span2">
+                        <img ng-src="{{user.avatar_url}}" alt="{{user.login}}" />
+                    </div>
+                    <div class="info span10">
+                        <ul>
+                            <li ng-show="user.name"><strong>Name :</strong>{{user.name}}</li>
+                            <li ng-show="user.email"><strong>Mail :</strong><a href="mailto:{{user.email}}" title="Send a email to {{user.name}}">{{user.email}}</a></li>
+                            <li ng-show="user.blog"><strong>Website :</strong><a href="{{user.blog}}" title="Website of {{user.name}}">{{user.blog}}</a></li>
+                            <li ng-show="user.location"><strong>Location :</strong>{{user.location}}</li>
+                            <li ng-show="commitsTxt"><strong>Commit : </strong>{{commitsTxt}}</li>
+                            <li ng-show="additionsTxt"><strong>Additions : </strong>{{additionsTxt}}</li>
+                            <li ng-show="deletionsTxt"><strong>Deletions : </strong>{{deletionsTxt}}</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                </div>
+            </div>
         </div>
 
         <!-- Angular Application -->
@@ -86,8 +130,10 @@
         }
         <!-- External libs -->
         <script src="@routes.Assets.at("javascripts/jquery-1.7.1.min.js")" type="text/javascript"></script>
-        <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
+        <script src="@routes.Assets.at("javascripts/awesomechart.js")" type="text/javascript"></script>
         <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.5.1/leaflet.min.js" type="text/javascript"></script>
+        <script src="@routes.Assets.at("javascripts/leaflet/leaflet.markercluster.js")" type="text/javascript"></script>
     </body>
 
 </html>
