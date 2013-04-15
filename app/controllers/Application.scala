@@ -19,6 +19,7 @@ import play.api.libs.concurrent.Execution.Implicits._
 import securesocial.core.SecureSocial
 import concurrent.{Await, Future}
 import scala.concurrent.duration._
+import services.Neo4j
 
 /**
  * Application's controllers.
@@ -32,6 +33,7 @@ object Application extends Controller with securesocial.core.SecureSocial {
    * @return
    */
   def index = UserAwareAction { implicit request =>
+    Logger.debug("Neo4j " + Neo4j.graphDb.getNodeById(0).getId)
     request.user match {
       case Some(user) => {
         user.oAuth2Info match {
