@@ -10,6 +10,7 @@ class Neo4jPlugin(app: play.api.Application) extends Plugin {
 
   override def onStart{
     Logger.debug("Starting neo4j plugin")
+    Neo4j.initDb()
   }
 
   override def onStop(){

@@ -1,25 +1,17 @@
 package controllers
 
-import play.api.cache.Cache
-import play.api.data._
-import play.api.data.Forms._
 import play.api.i18n.{Lang, Messages}
 import play.api.Logger
-import play.api.libs.json.{JsString, JsObject, JsValue, Json}
+import play.api.libs.json.{JsObject, Json}
 import play.api.libs.ws.{Response, WS}
 import play.api.mvc._
-import play.api.Play
 import play.api.Play.current
 
-import com.typesafe.plugin._
 import scala.Some
-import io.Source
-import play.api.libs.iteratee.{Concurrent, Iteratee}
 import play.api.libs.concurrent.Execution.Implicits._
-import securesocial.core.SecureSocial
-import concurrent.{Await, Future}
-import scala.concurrent.duration._
-import services.Neo4j
+import concurrent.Future
+import services.{IndexGithub, Neo4j}
+import org.neo4j.graphdb._
 
 /**
  * Application's controllers.
@@ -69,4 +61,10 @@ object Application extends Controller with securesocial.core.SecureSocial {
       Ok(Json.toJson(i18n.get(lang.code)))
     }
   }
+
+  def indexUser(owner :String, token :String) = Action { implicit request =>
+    IndexGithub.indexUser(owner, token , 0, 2)
+    Ok(Json.toJson("OK"))
+  }
+
 }
