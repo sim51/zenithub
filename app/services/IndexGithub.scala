@@ -9,7 +9,7 @@ import ExecutionContext.Implicits.global
 import play.api.Logger
 import org.neo4j.cypher.{ExecutionResult, ExecutionEngine}
 import play.api.libs.ws.Response
-import play.api.libs.json.JsObject
+import play.api.libs.json.{JsValue, JsObject}
 
 /**
  * Class to save and index gtihub with some neo4j helper.
@@ -46,7 +46,7 @@ object IndexGithub {
   /**
    * Relation name for forks.
    */
-  val REL_FORK: String = "HAS_FORKED"
+  val REL_FORK: String = "IS_A_FORK_OF"
 
   /**
    * Relation name for contributors.
@@ -115,12 +115,31 @@ object IndexGithub {
     // Create nodes
     val repo: Node = getOrSaveRepo(login, repository)
 
+    // let see if it's a fork of something
+    var url :String = GITHUB_API_URL + "/repos/" + login + "/" + repository + "?access_token=" + token
+    val futureResp: Future[Response] = WS.url(url).get()
+    futureResp.map { response =>
+      if (response.status == 200) {
+        val json: JsValue = response.json
+        if(json.\("fork").as[Boolean]) {
+          val forkLogin :String = json.\("parent").\("owner").\("login").toString().replace("\"", "")
+          val forkName :String = json.\("parent").\("name").toString().replace("\"", "")
+          val fork: Node = getOrSaveRepo(forkLogin, forkName)
+          // fork relation between repos
+          createRelationship(REL_FORK,repo, fork)
+          // fork relation
+          indexRepo(forkLogin, forkName, token, depth +1, maxDepth)
+        }
+      }
+    }
+
+    // if we have to go deeper, let's index forks, watchers, stares & contributors
     if (depth < maxDepth) {
 
       Logger.debug("Going deeper")
 
       // get all forks : create relation and index user
-      var url: String = GITHUB_API_URL + "/repos/" + login + "/" + repository + "/forks?per_page=1000&access_token=" + token
+      url= GITHUB_API_URL + "/repos/" + login + "/" + repository + "/forks?per_page=1000&access_token=" + token
       indexUserFromAPIRepoReturnedRepositories(url, REL_FORK, repo, token, depth, maxDepth)
 
       // get all watcher : create relation and index user
