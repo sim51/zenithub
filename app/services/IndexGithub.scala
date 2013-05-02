@@ -3,11 +3,10 @@ package services
 import org.neo4j.graphdb._
 import org.neo4j.graphdb.index.Index
 import scala.concurrent.{ExecutionContext, Future}
-import play.api.libs.ws.{WS, Response}
+import play.api.libs.ws.WS
 import scala.collection.JavaConverters._
 import ExecutionContext.Implicits.global
-import play.api.Logger
-import org.neo4j.cypher.{ExecutionResult, ExecutionEngine}
+import play.api.{Logger, Play}
 import play.api.libs.ws.Response
 import play.api.libs.json.{JsValue, JsObject}
 
@@ -73,7 +72,7 @@ object IndexGithub {
    *
    * @param login
    */
-  def indexUser(login: String, token: String, depth: Int, maxDepth: Int) {
+  def indexUser(login: String, depth: Int, maxDepth: Int) {
     Logger.debug("Indexing github user " + login)
     // Create nodes
     val user: Node = getOrSaveUser(login)
@@ -81,24 +80,25 @@ object IndexGithub {
     if (depth < maxDepth) {
 
       // get all follower : create relation and index user
-      var url :String = GITHUB_API_URL + "/users/" + login + "/followers?per_page=100&access_token=" + token
-      indexUserFromAPIUserReturnUser(url, REL_FOLLOW, login, token, depth, maxDepth)
+      val urlFollowers :String = GITHUB_API_URL + "/users/" + login + "/followers?per_page=100&" + githubAuthParam
+      Logger.debug(urlFollowers)
+      indexUserFromAPIUserReturnUser(urlFollowers, REL_FOLLOW, login, depth, maxDepth)
 
       // get all following : create relation and index user
-      url = GITHUB_API_URL + "/users/" + login + "/following?per_page=100&access_token=" + token
-      indexUserFromAPIUserReturnUser(url, "following", login, token, depth, maxDepth)
+      val urlFollowing :String = GITHUB_API_URL + "/users/" + login + "/following?per_page=100&" + githubAuthParam
+      indexUserFromAPIUserReturnUser(urlFollowing, "following", login, depth, maxDepth)
 
       // get all user repo : create relation and index repo
-      url = GITHUB_API_URL + "/users/" + login + "/repos?per_page=100&access_token=" + token
-      indexRepoFromAPIUserReturnRepositories(url, login, REL_CREATE, token,  depth, maxDepth)
+      val urlRepos :String = GITHUB_API_URL + "/users/" + login + "/repos?per_page=100&" + githubAuthParam
+      indexRepoFromAPIUserReturnRepositories(urlRepos, login, REL_CREATE, depth, maxDepth)
 
       // get all stared repo by the user : create relation and index repo
-      url = GITHUB_API_URL + "/users/" + login + "/starred?per_page=100&access_token=" + token
-      indexRepoFromAPIUserReturnRepositories(url, login, REL_STARE, token,  depth, maxDepth)
+      val urlStarred :String = GITHUB_API_URL + "/users/" + login + "/starred?per_page=100&=" + githubAuthParam
+      indexRepoFromAPIUserReturnRepositories(urlStarred, login, REL_STARE, depth, maxDepth)
 
       // get all watch repo by the user: create relation and index repo
-      url = GITHUB_API_URL + "/users/" + login + "/subscriptions?per_page=100&access_token=" + token
-      indexRepoFromAPIUserReturnRepositories(url, login, REL_WATCHER, token,  depth, maxDepth)
+      val urlSubs :String = GITHUB_API_URL + "/users/" + login + "/subscriptions?per_page=100&=" + githubAuthParam
+      indexRepoFromAPIUserReturnRepositories(urlSubs, login, REL_WATCHER, depth, maxDepth)
 
     }
   }
@@ -108,15 +108,14 @@ object IndexGithub {
    *
    * @param login
    * @param repository
-   * @param token
    */
-  def indexRepo(login: String, repository: String, token: String, depth: Int, maxDepth: Int) {
+  def indexRepo(login: String, repository: String, depth: Int, maxDepth: Int) {
     Logger.debug("Indexing github repo " + repository + " by " + login)
     // Create nodes
     val repo: Node = getOrSaveRepo(login, repository)
 
     // let see if it's a fork of something
-    var url :String = GITHUB_API_URL + "/repos/" + login + "/" + repository + "?access_token=" + token
+    var url :String = GITHUB_API_URL + "/repos/" + login + "/" + repository + "?" + githubAuthParam
     val futureResp: Future[Response] = WS.url(url).get()
     futureResp.map { response =>
       if (response.status == 200) {
@@ -128,7 +127,7 @@ object IndexGithub {
           // fork relation between repos
           createRelationship(REL_FORK,repo, fork)
           // fork relation
-          indexRepo(forkLogin, forkName, token, depth +1, maxDepth)
+          indexRepo(forkLogin, forkName, depth +1, maxDepth)
         }
       }
     }
@@ -139,20 +138,20 @@ object IndexGithub {
       Logger.debug("Going deeper")
 
       // get all forks : create relation and index user
-      url= GITHUB_API_URL + "/repos/" + login + "/" + repository + "/forks?per_page=1000&access_token=" + token
-      indexUserFromAPIRepoReturnedRepositories(url, REL_FORK, repo, token, depth, maxDepth)
+      url= GITHUB_API_URL + "/repos/" + login + "/" + repository + "/forks?per_page=1000&" + githubAuthParam
+      indexUserFromAPIRepoReturnedRepositories(url, REL_FORK, repo, depth, maxDepth)
 
       // get all watcher : create relation and index user
-      url = GITHUB_API_URL + "/repos/" + login + "/" + repository + "/subscribers?per_page=1000&access_token=" + token
-      indexUserFromAPIRepoReturnedUser(url: String, REL_WATCHER, repo, token, depth, maxDepth)
+      url = GITHUB_API_URL + "/repos/" + login + "/" + repository + "/subscribers?per_page=1000&" + githubAuthParam
+      indexUserFromAPIRepoReturnedUser(url: String, REL_WATCHER, repo, depth, maxDepth)
 
       // get all stares : create relation and index user
-      url = GITHUB_API_URL + "/repos/" + login + "/" + repository + "/stargazers?per_page=1000&access_token=" + token
-      indexUserFromAPIRepoReturnedUser(url: String, REL_STARE, repo, token, depth, maxDepth)
+      url = GITHUB_API_URL + "/repos/" + login + "/" + repository + "/stargazers?per_page=1000&" + githubAuthParam
+      indexUserFromAPIRepoReturnedUser(url: String, REL_STARE, repo, depth, maxDepth)
 
       // get all contributors : create relation and index user
-      url = GITHUB_API_URL + "/repos/" + login + "/" + repository + "/contributors?per_page=1000&access_token=" + token
-      indexUserFromAPIRepoReturnedUser(url: String, REL_CONTRIBUTOR, repo, token, depth, maxDepth)
+      url = GITHUB_API_URL + "/repos/" + login + "/" + repository + "/contributors?per_page=1000&" + githubAuthParam
+      indexUserFromAPIRepoReturnedUser(url: String, REL_CONTRIBUTOR, repo, depth, maxDepth)
     }
   }
 
@@ -162,9 +161,8 @@ object IndexGithub {
    * @param url
    * @param relation
    * @param repo
-   * @param token
    */
-  def indexUserFromAPIRepoReturnedUser(url: String, relation: String, repo: Node, token: String, depth: Int, maxDepth: Int) {
+  def indexUserFromAPIRepoReturnedUser(url: String, relation: String, repo: Node, depth: Int, maxDepth: Int) {
     val futureResp: Future[Response] = WS.url(url).get()
     futureResp.map { response =>
       Logger.debug("Github response code is : " + response.status)
@@ -174,8 +172,8 @@ object IndexGithub {
         for (jsObject <- json) {
           val login: String = jsObject.\("login").toString().replace("\"", "")
           val user: Node = getOrSaveUser(login)
-          createRelationship("stars", user, repo)
-          indexUser(login, token, depth + 1, maxDepth)
+          createRelationship(relation, user, repo)
+          indexUser(login, depth + 1, maxDepth)
         }
         response.header("Link") match {
           case Some(link) => {
@@ -190,7 +188,7 @@ object IndexGithub {
             if (links.size > 0) {
               val nextUrl :String = links(0).split(";")(0).replace("<", "").replace(">", "")
               Logger.debug("There is some user stuff to do, SO calling url " + nextUrl)
-              indexUserFromAPIRepoReturnedUser(nextUrl, relation, repo, token, depth, maxDepth)
+              indexUserFromAPIRepoReturnedUser(nextUrl, relation, repo, depth, maxDepth)
             }
           }
         }
@@ -204,9 +202,8 @@ object IndexGithub {
    * @param url
    * @param relation
    * @param repo
-   * @param token
    */
-  def indexUserFromAPIRepoReturnedRepositories(url: String, relation: String, repo: Node, token: String, depth: Int, maxDepth: Int) {
+  def indexUserFromAPIRepoReturnedRepositories(url: String, relation: String, repo: Node, depth: Int, maxDepth: Int) {
     val futureResp: Future[Response] = WS.url(url).get()
     futureResp.map { response =>
       Logger.debug("Github response code is : " + response.status)
@@ -217,7 +214,7 @@ object IndexGithub {
           val watcher: String = jsObject.\("owner").\("login").toString().replace("\"", "")
           val watcherNode: Node = getOrSaveUser(watcher)
           createRelationship(relation, watcherNode, repo)
-          indexUser(watcher, token, depth + 1, maxDepth)
+          indexUser(watcher, depth + 1, maxDepth)
         }
         // let see if there a pagination by looking at Link header's param.
         response.header("Link") match {
@@ -233,7 +230,7 @@ object IndexGithub {
             if (links.size > 0) {
               val nextUrl :String = links(0).split(";")(0).replace("<", "").replace(">", "")
               Logger.debug("There is some user stuff to do, so calling url " + nextUrl)
-              indexUserFromAPIRepoReturnedRepositories(nextUrl, relation, repo, token, depth, maxDepth)
+              indexUserFromAPIRepoReturnedRepositories(nextUrl, relation, repo, depth, maxDepth)
             }
           }
         }
@@ -246,11 +243,10 @@ object IndexGithub {
    *
    * @param url
    * @param login
-   * @param token
    * @param depth
    * @param maxDepth
    */
-  def indexRepoFromAPIUserReturnRepositories(url: String, login: String, relation :String, token: String, depth: Int, maxDepth: Int) {
+  def indexRepoFromAPIUserReturnRepositories(url: String, login: String, relation :String, depth: Int, maxDepth: Int) {
     val futurereposResp: Future[Response] = WS.url(url).get()
     futurereposResp.map { response =>
       Logger.debug("Github response code is : " + response.status)
@@ -263,7 +259,7 @@ object IndexGithub {
           val repoNode :Node = getOrSaveRepo(owner, repo)
           val userNode :Node = getOrSaveUser(login)
           createRelationship(relation, userNode, repoNode)
-          indexRepo(login, repo, token, depth + 1, maxDepth)
+          indexRepo(login, repo, depth + 1, maxDepth)
         }
         // let see if there a pagination by looking at Link header's param.
         response.header("Link") match {
@@ -279,7 +275,7 @@ object IndexGithub {
             if (links.size > 0) {
               val nextUrl :String = links(0).split(";")(0).replace("<", "").replace(">", "")
               Logger.debug("There is some user stuff to do, so calling url " + nextUrl)
-              indexRepoFromAPIUserReturnRepositories(nextUrl, login, relation, token, depth, maxDepth)
+              indexRepoFromAPIUserReturnRepositories(nextUrl, login, relation, depth, maxDepth)
             }
           }
         }
@@ -292,11 +288,10 @@ object IndexGithub {
    *
    * @param url
    * @param login
-   * @param token
    * @param depth
    * @param maxDepth
    */
-  def indexUserFromAPIUserReturnUser(url: String, relation :String, login: String, token: String, depth: Int, maxDepth: Int) {
+  def indexUserFromAPIUserReturnUser(url: String, relation :String, login: String, depth: Int, maxDepth: Int) {
     val futurereposResp: Future[Response] = WS.url(url).get()
     futurereposResp.map { response =>
       Logger.debug("Github response code is : " + response.status)
@@ -312,7 +307,7 @@ object IndexGithub {
           } else {
             createRelationship(REL_FOLLOW, user, followingNode)
           }
-          indexUser(following, token, depth + 1, maxDepth)
+          indexUser(following, depth + 1, maxDepth)
         }
         // let see if there a pagination by looking at Link header's param.
         response.header("Link") match {
@@ -328,7 +323,7 @@ object IndexGithub {
             if (links.size > 0) {
               val nextUrl :String = links(0).split(";")(0).replace("<", "").replace(">", "")
               Logger.debug("There is some user stuff to do, so calling url " + nextUrl)
-              indexUserFromAPIUserReturnUser(nextUrl, relation, login, token, depth, maxDepth)
+              indexUserFromAPIUserReturnUser(nextUrl, relation, login, depth, maxDepth)
             }
           }
         }
@@ -475,4 +470,18 @@ object IndexGithub {
     }
   }
 
+  def githubAuthParam :String = {
+    var params :String = ""
+    Play.current.configuration.getString("securesocial.github.clientId") match {
+      case Some(param) => {
+        params += "client_id=" + param
+      }
+    }
+    Play.current.configuration.getString("securesocial.github.clientSecret") match {
+      case Some(param) => {
+        params += "&client_secret=" + param
+      }
+    }
+    params
+  }
 }
