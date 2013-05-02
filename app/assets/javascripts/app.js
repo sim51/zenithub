@@ -1,8 +1,9 @@
 'use strict';
 
-/* App Module */
-var app = angular.module('zenithub', ['github', 'AwesomeChartJS']);
+/* List all necessary angular module for the application */
+var app = angular.module('application', ['ngCookies', 'zenithub', 'github', 'play', 'AwesomeChartJS', 'ngCookies']);
 
+/* Configure the application with the route */
 app.config(function($routeProvider) {
 		$routeProvider
 			.when('/error', {templateUrl: '/assets/partials/error.html', controller: ErrorCtrl})
@@ -15,17 +16,32 @@ app.config(function($routeProvider) {
 	      	.otherwise({redirectTo: '/search/'});
 	});
 
-app.run(function($rootScope, $github, $location){
+/* What we do when application start ? */
+app.run(function($rootScope, $cookieStore, $cookies, $location, Github, Play){
+    console.log("[MAIN] Application start");
+
+    // loading i18n properties
+    $rootScope.messages = [];
+    Play.messages().then(function(data){
+        $rootScope.messages = data;
+    });
+
+    // we look at cookies to know user is logged
+    if ( $cookies['token'] ) {
+        $rootScope.isConnected=true;
+        $rootScope.token=$cookieStore.get('token').replace(/"/g,'');
+        console.log("[MAIN] user is authenticate with token: " + $rootScope.token);
+    }
+
+    // search repo function
 	$rootScope.searchRepository = function() {
 		var keyword = $rootScope.keyword;
 		$location.path('/search/'+ keyword);
 	}
-	$rootScope.formatDate = function( date1 ) {
-		var date = new Date(Date.parse( date1 ));
-		return date.toDateString();
-	}
+
+    // popup for member
 	$rootScope.popupMember = function (login, commits, additions, deletions, index){
-		$github.user(login).then(function(response){
+		Github.user(login).then(function(response){
 			$rootScope.user = response;
 			if(index >= 0){
 				$rootScope.commitsTxt = commits[index] + '/' + 100;

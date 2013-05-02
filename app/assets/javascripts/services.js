@@ -1,15 +1,19 @@
 'use strict';
 
-var githuburl = 'http://api.zenithub.logisima.com';
-var nominatimurl = 'http://nominatim.openstreetmap.org';
+angular.module('zenithub', [])
+    .value('Config', {
+        githuburl : 'https://api.github.com',
+        nominatimurl : 'http://nominatim.openstreetmap.org',
+        SUCCES : 'TRUE'
+    });
 
-/* Services */
-angular.module('github', [ ])
+/* github Services */
+angular.module('github', ['zenithub'])
     /* Github service*/
-    .factory('$github', function($http, $location, $rootScope){
+    .factory('Github', function($http, $location, $rootScope, Config){
         return {
             search:function(keyword){
-                var url = githuburl + '/legacy/repos/search/' + keyword + '?callback=JSON_CALLBACK';
+                var url = Config.githuburl + '/legacy/repos/search/' + keyword + '?callback=JSON_CALLBACK&access_token=' + $rootScope.token;
                 return $http.jsonp( url, {cache:true} )
                     .then(function (response){
                         if( response.status == 200 && response.data.meta.status == 200){
@@ -21,7 +25,7 @@ angular.module('github', [ ])
                     });
             },
             repo:function(owner, repo){
-                var url = githuburl + '/repos/' + owner + '/' + repo  + '?callback=JSON_CALLBACK';
+                var url = Config.githuburl + '/repos/' + owner + '/' + repo  + '?callback=JSON_CALLBACK&access_token=' + $rootScope.token;
                 return $http.jsonp( url, {cache:true} )
                     .then(function (response){
                         if( response.status == 200 && response.data.meta.status == 200){
@@ -33,7 +37,7 @@ angular.module('github', [ ])
                     });   
             },
             commit:function(owner, repo, sha){
-                var url = githuburl + '/repos/' + owner + '/' + repo  + '/commits/' + sha + '?per_page=100&callback=JSON_CALLBACK';
+                var url = Config.githuburl + '/repos/' + owner + '/' + repo  + '/commits/' + sha + '?per_page=100&callback=JSON_CALLBACK&access_token=' + $rootScope.token
                 return $http.jsonp( url, {cache:true} )
                     .then(function (response){
                         if( response.status == 200 && response.data.meta.status == 200){
@@ -45,7 +49,7 @@ angular.module('github', [ ])
                     });   
             },
             commits:function(owner, repo, sha){
-                var url = githuburl + '/repos/' + owner + '/' + repo  + '/commits?per_page=100&callback=JSON_CALLBACK';
+                var url = Config.githuburl + '/repos/' + owner + '/' + repo  + '/commits?per_page=100&callback=JSON_CALLBACK&access_token=' + $rootScope.token
                 return $http.jsonp( url, {cache:true} )
                     .then(function (response){
                         if( response.status == 200 && response.data.meta.status == 200){
@@ -57,7 +61,7 @@ angular.module('github', [ ])
                     });   
             },
             members:function(owner, repo){
-                var url = githuburl + '/repos/' + owner + '/' + repo  + '/collaborators?callback=JSON_CALLBACK';
+                var url = Config.githuburl + '/repos/' + owner + '/' + repo  + '/collaborators?callback=JSON_CALLBACK&access_token=' + $rootScope.token
                 return $http.jsonp( url, {cache:true} )
                     .then(function (response){
                         if( response.status == 200 && response.data.meta.status == 200){
@@ -69,7 +73,7 @@ angular.module('github', [ ])
                     });   
             },
             contributors:function(owner, repo){
-                var url = githuburl + '/repos/' + owner + '/' + repo  + '/contributors?callback=JSON_CALLBACK';
+                var url = Config.githuburl + '/repos/' + owner + '/' + repo  + '/contributors?callback=JSON_CALLBACK&access_token=' + $rootScope.token
                 return $http.jsonp( url, {cache:true} )
                     .then(function (response){
                         if( response.status == 200 && response.data.meta.status == 200){
@@ -81,7 +85,7 @@ angular.module('github', [ ])
                     });   
             },
             user:function(login){
-                var url = githuburl + '/users/' + login  + '?callback=JSON_CALLBACK';
+                var url = Config.githuburl + '/users/' + login  + '?callback=JSON_CALLBACK&access_token=' + $rootScope.token
                 return $http.jsonp( url, {cache:true} )
                     .then(function (response){
                         if( response.status == 200 && response.data.meta.status == 200){
@@ -95,10 +99,10 @@ angular.module('github', [ ])
         }
     })
     /* nominatim service */
-    .factory('$nominatim', function($http, $location, $rootScope){
+    .factory('Nominatim', function($http, $location, $rootScope){
         return{
             locate:function(location){
-                var url = nominatimurl + '/search?q=' + location + '&format=json&json_callback=JSON_CALLBACK';
+                var url = Config.nominatimurl + '/search?q=' + location + '&format=json&json_callback=JSON_CALLBACK';
                 return $http.jsonp( url )
                     .then(function (response){
                         if( response.status == 200 ){
@@ -108,6 +112,70 @@ angular.module('github', [ ])
                             $location.path('/error');
                         }
                     });   
+            }
+        }
+    });
+
+angular.module('play', [ ])
+    .factory('Play', function($http, $location, $rootScope){
+        return {
+            messages:function(){
+                var url = '/api/messages';
+                return $http.get( url )
+                    .then(function (response){
+                        if( response.status == 200 ){
+                            return response.data;
+                        }else{
+                            $rootScope.error = {
+                                title:"Error when retriving I18N messages.",
+                                message:$rootScope.messages['error.case'] + "Http code (" + url + ") : " + response.status
+                            };
+                            $location.path('/error');
+                        }
+                    });
+            },
+            token:function(){
+                var url = '/api/token';
+                return $http.get( url ).then(function (response){
+                    if( response.status == 200 ){
+                        return response.data.replace(/"/g, '');
+                    }else{
+                        $rootScope.error = {
+                            title:"Error when retriving token.",
+                            message:$rootScope.messages['error.case'] + "Http code (" + url + ") : " + response.status
+                        };
+                        $location.path('/error');
+                    }
+                });
+            },
+            sendMail:function(name, email, message, token){
+                console.log("[Play|sendMail] Name:" + name + ", email:" + email +", message:" + message +", token:"+token);
+                var url = '/api/mail';
+                var data = "name="+ name +"&email=" + email +"&message=" + message + "&token=" + token;
+                $http({
+                    method: 'POST',
+                    url: url,
+                    data: data,
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+                })
+                    .success(function(data, status, headers, config) {
+                        if( status == 200 ){
+                            return SUCCESS;
+                        }else{
+                            $rootScope.error = {
+                                title:"Error when retriving token.",
+                                message:$rootScope.messages['error.case'] + "Http code (" + url + ") : " + response.status
+                            };
+                            $location.path('/error');
+                        }
+                    })
+                    .error(function(data, status, headers, config) {
+                        $rootScope.error = {
+                            title:$rootScope.messages['error.sendMail'],
+                            message:$rootScope.messages['error.case'] + "Http code (" + url + ") : " + response.status
+                        };
+                        $location.path('/error');
+                    })
             }
         }
     });
