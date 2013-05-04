@@ -6,7 +6,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~
 GET     /                               controllers.Application.index
 GET     /api/messages                   controllers.Application.messages
-GET     /api/index/user/:user           controllers.Application.indexUser(user)
+GET     /api/index/user/:user/:token    controllers.Application.indexUser(user, token)
 
 # SECURE SOCIAL ROUTES
 # ~~~~~~~~~~~~~~~~~~~~~

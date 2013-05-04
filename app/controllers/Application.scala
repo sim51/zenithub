@@ -62,8 +62,8 @@ object Application extends Controller with securesocial.core.SecureSocial {
     }
   }
 
-  def indexUser(owner :String) = Action { implicit request =>
-    IndexGithub.indexUser(owner, 0, 2)
+  def indexUser(owner :String, token :String) = Action { implicit request =>
+    IndexGithub.indexUser(owner, 0, 2, token)
     Ok(Json.toJson("OK"))
   }
 
