@@ -45,6 +45,31 @@ object Application extends Controller with securesocial.core.SecureSocial {
       }
     }
   }
+
+  /**
+   * How to index a github user.
+   *
+   * @param owner
+   * @param token
+   * @return
+   */
+  def indexUser(owner :String, token :String) = Action { implicit request =>
+    IndexGithub.indexUser(owner, 0, 2, token)
+    Ok(Json.toJson("OK"))
+  }
+
+  /**
+   * How to index a github repository.
+   *
+   * @param owner
+   * @param name
+   * @param token
+   * @return
+   */
+  def indexRepository(owner :String, name :String, token :String) = Action { implicit request =>
+    IndexGithub.indexRepo(owner, name, 0, 2, token)
+    Ok(Json.toJson("OK"))
+  }
   
   /**
    * JSON action to retrive all messages.
@@ -60,11 +85,6 @@ object Application extends Controller with securesocial.core.SecureSocial {
     else{
       Ok(Json.toJson(i18n.get(lang.code)))
     }
-  }
-
-  def indexUser(owner :String, token :String) = Action { implicit request =>
-    IndexGithub.indexUser(owner, 0, 2, token)
-    Ok(Json.toJson("OK"))
   }
 
 }
