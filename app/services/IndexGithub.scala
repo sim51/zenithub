@@ -11,6 +11,7 @@ import play.api.libs.ws.Response
 import play.api.libs.json.{JsValue, JsObject}
 import java.util.Date
 import java.text.SimpleDateFormat
+import org.neo4j.cypher.{ExecutionResult, ExecutionEngine}
 
 /**
  * Class to save and index gtihub with some neo4j helper.
@@ -152,9 +153,9 @@ object IndexGithub {
       }
 
       // get all forks : create relation and index user
-      url = GITHUB_API_URL + "/repos/" + login + "/" + repository + "/forks?per_page=" + PER_PAGE + "&" + githubAuthParam(token)
-      Logger.debug("Get all forks for " + login + "/" + repository + " => " + url)
-      indexUserFromAPIRepoReturnedRepositories(url, REL_FORK, repo, depth, maxDepth, token)
+      //url = GITHUB_API_URL + "/repos/" + login + "/" + repository + "/forks?per_page=" + PER_PAGE + "&" + githubAuthParam(token)
+      //Logger.debug("Get all forks for " + login + "/" + repository + " => " + url)
+      //indexUserFromAPIRepoReturnedRepositories(url, REL_FORK, repo, depth, maxDepth, token)
 
       // get all watcher : create relation and index user
       //url = GITHUB_API_URL + "/repos/" + login + "/" + repository + "/subscribers?per_page=" + PER_PAGE + "&" + githubAuthParam(token)
@@ -574,5 +575,69 @@ object IndexGithub {
   def githubAuthParam(token: String): String = {
     val params: String = "access_token=" + token
     params
+  }
+
+  def getUserReco(name :String) :List[String] ={
+    var users :List[String] = List[String]()
+    val engine :ExecutionEngine = new ExecutionEngine(Neo4j.graphDb);
+    val result :ExecutionResult = engine.execute("" +
+      "START " +
+        "me=node:USER(login=\"" + name + "\") " +
+      "MATCH " +
+        "me-[:FOLLOW]->friend-[:FOLLOW]->friend_of_friend, " +
+        "me-[r?:FOLLOW]->friend_of_friend " +
+      "WHERE " +
+        "(r IS NULL) AND " +
+        "friend_of_friend <> me " +
+      "RETURN " +
+        "friend_of_friend.login, COUNT(*) " +
+      "ORDER BY " +
+        "COUNT(*) DESC " +
+      "LIMIT 3");
+    result.foreach( row => {
+      users = row.getOrElse("friend_of_friend.login", "").toString :: users
+    })
+    users
+  }
+
+  def getRepositoryReco(login :Option[String], name :String) :List[String] = {
+    var repos :List[String] = List()
+    val engine :ExecutionEngine = new ExecutionEngine(Neo4j.graphDb);
+    val query :String = login match {
+      case Some(login) => {
+        "START " +
+          "repo=node:REPOSITORY(name=\"" + name + "\"), " +
+          "me=node:USER(login=\"" + login + "\") " +
+        "MATCH " +
+          "stargazers-[:STARE]->repo, " +
+          "stargazers-[:STARE]->repos, " +
+          "me-[r?:STARE]->repos " +
+        "WHERE " +
+          "r IS NULL " +
+        "RETURN " +
+          "repos.name, COUNT(*) " +
+        "ORDER BY " +
+          "COUNT(*) DESC " +
+        "LIMIT 3"
+      }
+      case None => {
+        "START " +
+          "repo=node:REPOSITORY(name=\"" + name + "\") " +
+        "MATCH " +
+          "stargazers-[:STARE]->repo, " +
+          "stargazers-[:STARE]->repos " +
+        "RETURN " +
+          "repos.name, COUNT(*) " +
+        "ORDER BY " +
+          "COUNT(*) DESC " +
+        "LIMIT 3"
+      }
+    }
+    Logger.debug(query)
+    val result :ExecutionResult = engine.execute(query);
+    result.foreach( row => {
+      repos = row.getOrElse("repos.name", "").toString :: repos
+    })
+    repos
   }
 }

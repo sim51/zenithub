@@ -70,6 +70,26 @@ object Application extends Controller with securesocial.core.SecureSocial {
     IndexGithub.indexRepo(owner, name, 0, 2, token)
     Ok(Json.toJson("OK"))
   }
+
+  /**
+   * Getting user recommendation for a github user identified by its login.
+   *
+   * @param login
+   * @return
+   */
+  def userRecommendation(login :String) = Action { implicit request =>
+    Ok(Json.toJson(IndexGithub.getUserReco(login)))
+  }
+
+  /**
+   * Getting repository recommendation for a github repository.
+   *
+   * @param name
+   * @return
+   */
+  def repoRecommendation(owner :String, name :String) = Action { implicit request =>
+    Ok(Json.toJson(IndexGithub.getRepositoryReco(request.getQueryString("login"), owner + "/" + name)))
+  }
   
   /**
    * JSON action to retrive all messages.
