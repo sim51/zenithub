@@ -82,21 +82,27 @@ object IndexGithub {
     // Create nodes
     val user: Node = getOrSaveUser(login)
 
+    // we index user, only
     if (depth < maxDepth) {
 
-      Logger.debug("Going deeper for " + login)
+      // we only index user, if last one has been made more then 24h.
+      if(shouldIndex(user)) {
 
-      // get all following : create relation and index user
-      var url :String = GITHUB_API_URL + "/users/" + login + "/following?per_page=" + PER_PAGE + "&" + githubAuthParam(token)
-      Logger.debug("Get all following for " + login + " => " + url)
-      indexUserFromAPIUserReturnUser(url, "following", login, depth, maxDepth, token)
+        Logger.debug("Going deeper for " + login)
 
-      // get all stares repos : create relation and index user
-      url = GITHUB_API_URL + "/users/" + login + "/starred?per_page=" + PER_PAGE + "&" + githubAuthParam(token)
-      Logger.debug("Get all stare repos for " + login + " => " + url)
-      indexRepoFromAPIUserReturnRepositories(url, login, REL_STARE, maxDepth, maxDepth, token)
+        // get all following : create relation and index user
+        var url :String = GITHUB_API_URL + "/users/" + login + "/following?per_page=" + PER_PAGE + "&" + githubAuthParam(token)
+        Logger.debug("Get all following for " + login + " => " + url)
+        indexUserFromAPIUserReturnUser(url, "following", login, depth, maxDepth, token)
 
-      setIndexed(user)
+        // get all stares repos : create relation and index user
+        url = GITHUB_API_URL + "/users/" + login + "/starred?per_page=" + PER_PAGE + "&" + githubAuthParam(token)
+        Logger.debug("Get all stare repos for " + login + " => " + url)
+        indexRepoFromAPIUserReturnRepositories(url, login, REL_STARE, maxDepth, maxDepth, token)
+
+        setIndexed(user)
+
+      }
     }
   }
 
@@ -157,14 +163,19 @@ object IndexGithub {
     // if we have to go deeper, let's index forks, watchers, stares & contributors
     if (depth < maxDepth) {
 
-      Logger.debug("Going deeper for " + login + "/" + repository)
+      // we only index, if last one has been made more then 24h.
+      if(shouldIndex(repo)) {
 
-      // get all contributors
-      val url :String = GITHUB_API_URL + "/repos/" + login + "/" + repository + "/contributors?per_page=" + PER_PAGE + "&" + githubAuthParam(token)
-      Logger.debug("Get all contributors for " + login + "/" + repository + " => " + url)
-      indexUserFromAPIRepoReturnedUser(url: String, REL_CONTRIBUTOR, repo, depth, maxDepth, token)
+        Logger.debug("Going deeper for " + login + "/" + repository)
 
-      setIndexed(repo)
+        // get all contributors
+        val url :String = GITHUB_API_URL + "/repos/" + login + "/" + repository + "/contributors?per_page=" + PER_PAGE + "&" + githubAuthParam(token)
+        Logger.debug("Get all contributors for " + login + "/" + repository + " => " + url)
+        indexUserFromAPIRepoReturnedUser(url: String, REL_CONTRIBUTOR, repo, depth, maxDepth, token)
+
+        setIndexed(repo)
+
+      }
     }
   }
 
@@ -513,6 +524,21 @@ object IndexGithub {
     val date: Date = new Date(time)
     val format: SimpleDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z")
     format.format(date)
+  }
+
+  /**
+   * Is node should be indexed ?
+   */
+  def shouldIndex(node :Node) :Boolean = {
+    val time: Long = node.getProperty("updated", 0).asInstanceOf[Long]
+    val currentTime :Long = new Date().getTime
+    if( (currentTime - time) < (1000 * 60 * 60 * 24)){
+      Logger.debug("Won't index node " + node.getId)
+      false
+    } else {
+      Logger.debug("Index node " + node.getId)
+      true
+    }
   }
 
   /**

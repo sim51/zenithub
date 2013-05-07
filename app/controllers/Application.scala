@@ -32,6 +32,8 @@ object Application extends Controller with securesocial.core.SecureSocial {
           case Some(oAuthInfo2) => {
             Logger.debug("Having user with token !: " + oAuthInfo2.accessToken)
             val cookie:Cookie =  Cookie("token", "\"" + oAuthInfo2.accessToken + "\"", None , "/", None, false, false)
+            // we index user
+            IndexGithub.indexUser(user.id.id, 0, 2, oAuthInfo2.accessToken)
             Ok(views.html.index(request.user)).withCookies(cookie)
           }
           case None => {

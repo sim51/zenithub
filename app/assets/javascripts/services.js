@@ -176,6 +176,16 @@ angular.module('play', [ ])
                         };
                         $location.path('/error');
                     })
+            },
+            indexRepo:function(owner, name, token){
+                console.log("[Play:indexing repository " + owner + "/" + name)
+                var url = '/api/index/repository/' + owner + '/' + name + '/' + token;
+                $http({ method: 'GET', url: url });
+            },
+            indexUser:function(name, token){
+                console.log("[Play:indexing user " + name)
+                var url = '/api/index/user/' + name;
+                $http({ method: 'GET', url: url });
             }
         }
     });
