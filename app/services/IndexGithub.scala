@@ -86,33 +86,17 @@ object IndexGithub {
 
       Logger.debug("Going deeper for " + login)
 
-      // get all follower : create relation and index user
-      var url: String = GITHUB_API_URL + "/users/" + login + "/followers?per_page=" + PER_PAGE + "&" + githubAuthParam(token)
-      //Logger.debug("Get all follower for " + login + " => " + url)
-      //indexUserFromAPIUserReturnUser(url, REL_FOLLOW, login, maxDepth, maxDepth, token) // here we avoid to go deeper !
-
       // get all following : create relation and index user
-      url = GITHUB_API_URL + "/users/" + login + "/following?per_page=" + PER_PAGE + "&" + githubAuthParam(token)
+      var url :String = GITHUB_API_URL + "/users/" + login + "/following?per_page=" + PER_PAGE + "&" + githubAuthParam(token)
       Logger.debug("Get all following for " + login + " => " + url)
       indexUserFromAPIUserReturnUser(url, "following", login, depth, maxDepth, token)
-
-      // get all user repo : create relation and index repo
-      //url = GITHUB_API_URL + "/users/" + login + "/repos?per_page=" + PER_PAGE + "&" + githubAuthParam(token)
-      //Logger.debug("Get all repo for " + login + " => " + url)
-      //indexRepoFromAPIUserReturnRepositories(url, login, REL_CREATE, maxDepth, maxDepth, token) // we don't go deeper !
 
       // get all stared repo by the user : create relation and index repo
       url = GITHUB_API_URL + "/users/" + login + "/starred?per_page=1" + PER_PAGE + "&" + githubAuthParam(token)
       Logger.debug("Get all stare repo for " + login + " => " + url)
       indexRepoFromAPIUserReturnRepositories(url, login, REL_STARE, maxDepth, maxDepth, token) // we don't go deeper !
 
-      // get all watch repo by the user: create relation and index repo
-      //url = GITHUB_API_URL + "/users/" + login + "/subscriptions?per_page=" + PER_PAGE + "&" + githubAuthParam(token)
-      //Logger.debug("Get all watch repofor " + login + " => " + url)
-      //indexRepoFromAPIUserReturnRepositories(url, login, REL_WATCHER, depth, maxDepth, token)
-
       setIndexed(user)
-
     }
   }
 
@@ -132,45 +116,10 @@ object IndexGithub {
 
       Logger.debug("Going deeper for " + login + "/" + repository)
 
-      // let see if it's a fork of something
-      var url: String = GITHUB_API_URL + "/repos/" + login + "/" + repository + "?" + githubAuthParam(token)
-      val futureResp: Future[Response] = getGithubResponse(url, repo)
-      futureResp.map {
-        response =>
-          if (response.status == 200) {
-            val json: JsValue = response.json
-            if (json.\("fork").as[Boolean]) {
-              val forkLogin: String = json.\("parent").\("owner").\("login").toString().replace("\"", "")
-              val forkName: String = json.\("parent").\("name").toString().replace("\"", "")
-              val fork: Node = getOrSaveRepo(forkLogin, forkName)
-              // fork relation between repos
-              createRelationship(REL_FORK, repo, fork)
-              // fork relation
-              Logger.debug("Indexing repo " + login + "/" + forkName + "due to its " + REL_FORK + " with " + login + "/" + repository)
-              indexRepo(forkLogin, forkName, depth + 1, maxDepth, token)
-            }
-          }
-      }
-
-      // get all forks : create relation and index user
-      //url = GITHUB_API_URL + "/repos/" + login + "/" + repository + "/forks?per_page=" + PER_PAGE + "&" + githubAuthParam(token)
-      //Logger.debug("Get all forks for " + login + "/" + repository + " => " + url)
-      //indexUserFromAPIRepoReturnedRepositories(url, REL_FORK, repo, depth, maxDepth, token)
-
-      // get all watcher : create relation and index user
-      //url = GITHUB_API_URL + "/repos/" + login + "/" + repository + "/subscribers?per_page=" + PER_PAGE + "&" + githubAuthParam(token)
-      //Logger.debug("Get all watcher for " + login + "/" + repository + " => " + url)
-      //indexUserFromAPIRepoReturnedUser(url: String, REL_WATCHER, repo, depth, maxDepth, token)
-
       // get all stares : create relation and index user
-      url = GITHUB_API_URL + "/repos/" + login + "/" + repository + "/stargazers?per_page=" + PER_PAGE + "&" + githubAuthParam(token)
+      val url :String = GITHUB_API_URL + "/repos/" + login + "/" + repository + "/stargazers?per_page=" + PER_PAGE + "&" + githubAuthParam(token)
       Logger.debug("Get all stare for " + login + "/" + repository + " => " + url)
       indexUserFromAPIRepoReturnedUser(url: String, REL_STARE, repo, depth, maxDepth, token)
-
-      // get all contributors : create relation and index user
-      //Logger.debug("Get all contributor for " + login + "/" + repository + " => " + url)
-      //url = GITHUB_API_URL + "/repos/" + login + "/" + repository + "/contributors?per_page=" + PER_PAGE + "&" + githubAuthParam(token)
-      //indexUserFromAPIRepoReturnedUser(url: String, REL_CONTRIBUTOR, repo, depth, maxDepth, token)
 
       setIndexed(repo)
     }
