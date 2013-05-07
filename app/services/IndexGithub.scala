@@ -91,37 +91,12 @@ object IndexGithub {
       Logger.debug("Get all following for " + login + " => " + url)
       indexUserFromAPIUserReturnUser(url, "following", login, depth, maxDepth, token)
 
-      // get all stared repo by the user : create relation and index repo
-      url = GITHUB_API_URL + "/users/" + login + "/starred?per_page=1" + PER_PAGE + "&" + githubAuthParam(token)
-      Logger.debug("Get all stare repo for " + login + " => " + url)
-      indexRepoFromAPIUserReturnRepositories(url, login, REL_STARE, maxDepth, maxDepth, token) // we don't go deeper !
+      // get all stares repos : create relation and index user
+      url = GITHUB_API_URL + "/users/" + login + "/starred?per_page=" + PER_PAGE + "&" + githubAuthParam(token)
+      Logger.debug("Get all stare repos for " + login + " => " + url)
+      indexRepoFromAPIUserReturnRepositories(url, login, REL_STARE, maxDepth, maxDepth, token)
 
       setIndexed(user)
-    }
-  }
-
-  /**
-   * Index github repo into neo4j database.
-   *
-   * @param login
-   * @param repository
-   */
-  def indexRepo(login: String, repository: String, depth: Int, maxDepth: Int, token: String) {
-    Logger.debug("Indexing github repo " + repository + " by " + login)
-    // Create nodes
-    val repo: Node = getOrSaveRepo(login, repository)
-
-    // if we have to go deeper, let's index forks, watchers, stares & contributors
-    if (depth < maxDepth) {
-
-      Logger.debug("Going deeper for " + login + "/" + repository)
-
-      // get all stares : create relation and index user
-      val url :String = GITHUB_API_URL + "/repos/" + login + "/" + repository + "/stargazers?per_page=" + PER_PAGE + "&" + githubAuthParam(token)
-      Logger.debug("Get all stare for " + login + "/" + repository + " => " + url)
-      indexUserFromAPIRepoReturnedUser(url: String, REL_STARE, repo, depth, maxDepth, token)
-
-      setIndexed(repo)
     }
   }
 
@@ -165,6 +140,31 @@ object IndexGithub {
             }
           }
         }
+    }
+  }
+
+  /**
+   * Index github repo into neo4j database.
+   *
+   * @param login
+   * @param repository
+   */
+  def indexRepo(login: String, repository: String, depth: Int, maxDepth: Int, token: String) {
+    Logger.debug("Indexing github repo " + repository + " by " + login)
+    // Create nodes
+    val repo: Node = getOrSaveRepo(login, repository)
+
+    // if we have to go deeper, let's index forks, watchers, stares & contributors
+    if (depth < maxDepth) {
+
+      Logger.debug("Going deeper for " + login + "/" + repository)
+
+      // get all contributors
+      val url :String = GITHUB_API_URL + "/repos/" + login + "/" + repository + "/contributors?per_page=" + PER_PAGE + "&" + githubAuthParam(token)
+      Logger.debug("Get all contributors for " + login + "/" + repository + " => " + url)
+      indexUserFromAPIRepoReturnedUser(url: String, REL_CONTRIBUTOR, repo, depth, maxDepth, token)
+
+      setIndexed(repo)
     }
   }
 
@@ -558,10 +558,11 @@ object IndexGithub {
           "repo=node:REPOSITORY(name=\"" + name + "\"), " +
           "me=node:USER(login=\"" + login + "\") " +
         "MATCH " +
-          "stargazers-[:STARE]->repo, " +
-          "stargazers-[:STARE]->repos, " +
+          "contributors-[:HAS_CONTRIBUTED]->repo, " +
+          "contributors-[:STARE]->repos, " +
           "me-[r?:STARE]->repos " +
         "WHERE " +
+          "repos <> repo AND "
           "r IS NULL " +
         "RETURN " +
           "repos.name, COUNT(*) " +
@@ -573,8 +574,8 @@ object IndexGithub {
         "START " +
           "repo=node:REPOSITORY(name=\"" + name + "\") " +
         "MATCH " +
-          "stargazers-[:STARE]->repo, " +
-          "stargazers-[:STARE]->repos " +
+          "contributors-[:HAS_CONTRIBUTED]->repo, " +
+          "contributors-[:STARE]->repos " +
         "RETURN " +
           "repos.name, COUNT(*) " +
         "ORDER BY " +
