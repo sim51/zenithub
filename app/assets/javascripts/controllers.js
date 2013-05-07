@@ -3,7 +3,7 @@
 /* 
  *	Search a repository (/search/:keyword).
  */
-function RepositoryListCtrl($scope, $rootScope, $routeParams, Github) {
+function RepositoryListCtrl($scope, $rootScope, $routeParams, $location, Github, Play) {
 	var keyword = $routeParams.keyword  || '';
 	$rootScope.keyword = keyword;
 	if( keyword != ''){
@@ -13,6 +13,12 @@ function RepositoryListCtrl($scope, $rootScope, $routeParams, Github) {
 			$('#loading').hide();
 		});
 	}
+    $scope.repoClick = function(owner, name){
+        if($rootScope.isConnected) {
+            Play.indexRepo(owner, name, $rootScope.token)
+        }
+        $location.path('/repo/'+ owner + '/' + name);
+    }
 	$scope.orderProp = 'name';
 }
 

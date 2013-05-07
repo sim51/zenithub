@@ -13,7 +13,10 @@ angular.module('github', ['zenithub'])
     .factory('Github', function($http, $location, $rootScope, Config){
         return {
             search:function(keyword){
-                var url = Config.githuburl + '/legacy/repos/search/' + keyword + '?callback=JSON_CALLBACK&access_token=' + $rootScope.token;
+                var url = Config.githuburl + '/legacy/repos/search/' + keyword + '?callback=JSON_CALLBACK';
+                if($rootScope.isConnected) {
+                    url += '&access_token=' + $rootScope.token;
+                }
                 return $http.jsonp( url, {cache:true} )
                     .then(function (response){
                         if( response.status == 200 && response.data.meta.status == 200){
@@ -25,7 +28,10 @@ angular.module('github', ['zenithub'])
                     });
             },
             repo:function(owner, repo){
-                var url = Config.githuburl + '/repos/' + owner + '/' + repo  + '?callback=JSON_CALLBACK&access_token=' + $rootScope.token;
+                var url = Config.githuburl + '/repos/' + owner + '/' + repo  + '?callback=JSON_CALLBACK';
+                if($rootScope.isConnected) {
+                    url += '&access_token=' + $rootScope.token;
+                }
                 return $http.jsonp( url, {cache:true} )
                     .then(function (response){
                         if( response.status == 200 && response.data.meta.status == 200){
@@ -37,7 +43,10 @@ angular.module('github', ['zenithub'])
                     });   
             },
             commit:function(owner, repo, sha){
-                var url = Config.githuburl + '/repos/' + owner + '/' + repo  + '/commits/' + sha + '?per_page=100&callback=JSON_CALLBACK&access_token=' + $rootScope.token
+                var url = Config.githuburl + '/repos/' + owner + '/' + repo  + '/commits/' + sha + '?per_page=100&callback=JSON_CALLBACK';
+                if($rootScope.isConnected) {
+                    url += '&access_token=' + $rootScope.token;
+                }
                 return $http.jsonp( url, {cache:true} )
                     .then(function (response){
                         if( response.status == 200 && response.data.meta.status == 200){
@@ -49,7 +58,10 @@ angular.module('github', ['zenithub'])
                     });   
             },
             commits:function(owner, repo, sha){
-                var url = Config.githuburl + '/repos/' + owner + '/' + repo  + '/commits?per_page=100&callback=JSON_CALLBACK&access_token=' + $rootScope.token
+                var url = Config.githuburl + '/repos/' + owner + '/' + repo  + '/commits?per_page=100&callback=JSON_CALLBACK';
+                if($rootScope.isConnected) {
+                    url += '&access_token=' + $rootScope.token;
+                }
                 return $http.jsonp( url, {cache:true} )
                     .then(function (response){
                         if( response.status == 200 && response.data.meta.status == 200){
@@ -61,7 +73,10 @@ angular.module('github', ['zenithub'])
                     });   
             },
             members:function(owner, repo){
-                var url = Config.githuburl + '/repos/' + owner + '/' + repo  + '/collaborators?callback=JSON_CALLBACK&access_token=' + $rootScope.token
+                var url = Config.githuburl + '/repos/' + owner + '/' + repo  + '/collaborators?callback=JSON_CALLBACK';
+                if($rootScope.isConnected) {
+                    url += '&access_token=' + $rootScope.token;
+                }
                 return $http.jsonp( url, {cache:true} )
                     .then(function (response){
                         if( response.status == 200 && response.data.meta.status == 200){
@@ -73,7 +88,10 @@ angular.module('github', ['zenithub'])
                     });   
             },
             contributors:function(owner, repo){
-                var url = Config.githuburl + '/repos/' + owner + '/' + repo  + '/contributors?callback=JSON_CALLBACK&access_token=' + $rootScope.token
+                var url = Config.githuburl + '/repos/' + owner + '/' + repo  + '/contributors?callback=JSON_CALLBACK';
+                if($rootScope.isConnected) {
+                    url += '&access_token=' + $rootScope.token;
+                }
                 return $http.jsonp( url, {cache:true} )
                     .then(function (response){
                         if( response.status == 200 && response.data.meta.status == 200){
@@ -85,7 +103,10 @@ angular.module('github', ['zenithub'])
                     });   
             },
             user:function(login){
-                var url = Config.githuburl + '/users/' + login  + '?callback=JSON_CALLBACK&access_token=' + $rootScope.token
+                var url = Config.githuburl + '/users/' + login  + '?callback=JSON_CALLBACK';
+                if($rootScope.isConnected) {
+                    url += '&access_token=' + $rootScope.token;
+                }
                 return $http.jsonp( url, {cache:true} )
                     .then(function (response){
                         if( response.status == 200 && response.data.meta.status == 200){
@@ -99,7 +120,7 @@ angular.module('github', ['zenithub'])
         }
     })
     /* nominatim service */
-    .factory('Nominatim', function($http, $location, $rootScope){
+    .factory('Nominatim', function($http, $location, $rootScope, Config){
         return{
             locate:function(location){
                 var url = Config.nominatimurl + '/search?q=' + location + '&format=json&json_callback=JSON_CALLBACK';

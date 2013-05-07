@@ -530,7 +530,7 @@ object IndexGithub {
    * Is node should be indexed ?
    */
   def shouldIndex(node :Node) :Boolean = {
-    val time: Long = node.getProperty("updated", 0).asInstanceOf[Long]
+    val time: Long = node.getProperty("updated", 0.asInstanceOf[Long]).asInstanceOf[Long]
     val currentTime :Long = new Date().getTime
     if( (currentTime - time) < (1000 * 60 * 60 * 24)){
       Logger.debug("Won't index node " + node.getId)
