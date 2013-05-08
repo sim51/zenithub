@@ -8,8 +8,8 @@ GET     /                                       controllers.Application.index
 GET     /api/messages                           controllers.Application.messages
 GET     /api/index/user/:user/:token            controllers.Application.indexUser(user, token)
 GET     /api/index/repository/:user/:name/:token      controllers.Application.indexRepository(user, name, token)
-GET     /api/reco/users/:login                  controllers.Application.userRecommendation(login)
-GET     /api/reco/repositories/:owner/:name     controllers.Application.repoRecommendation(owner, name)
+GET     /api/reco/user/:login                  controllers.Application.userRecommendation(login)
+GET     /api/reco/repository/:owner/:name     controllers.Application.repoRecommendation(owner, name)
 
 # SECURE SOCIAL ROUTES
 # ~~~~~~~~~~~~~~~~~~~~~

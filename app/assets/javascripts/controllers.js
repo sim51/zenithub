@@ -25,7 +25,7 @@ function RepositoryListCtrl($scope, $rootScope, $routeParams, $location, Github,
 /* 
  *	Repository general informations (/repo/:owner/:repo).
  */
-function RepositoryHomeCtrl($scope, $routeParams, Github) {
+function RepositoryHomeCtrl($scope, $routeParams, Github, Play) {
 	$('#loading').show();
 	var owner = $routeParams.owner;
 	var repo = $routeParams.repository;
@@ -33,6 +33,9 @@ function RepositoryHomeCtrl($scope, $routeParams, Github) {
 		$scope.repository = response;
 		$('#loading').hide();
 	});
+    Play.getRepoReco(owner, repo).then(function(response){
+        $scope.recos = response;
+    })
     $('#sidenav').affix();
 }
 

@@ -80,7 +80,7 @@ object IndexGithub {
   def indexUser(login: String, depth: Int, maxDepth: Int, token: String) {
     Logger.debug("Indexing github user " + login)
     // Create nodes
-    val user: Node = getOrSaveUser(login)
+    val user: Node = getOrSaveUser(login, None, token)
 
     // we index user, only
     if (depth < maxDepth) {
@@ -123,7 +123,8 @@ object IndexGithub {
           Logger.debug("Url " + url + " has " + json.size + " relation of type " + relation)
           for (jsObject <- json) {
             val login: String = jsObject.\("login").toString().replace("\"", "")
-            val user: Node = getOrSaveUser(login)
+            val avatar: Option[String] = Some(jsObject.\("avatar_url").toString().replace("\"", ""))
+            val user: Node = getOrSaveUser(login, avatar, token)
             createRelationship(relation, user, repo)
             Logger.debug("Indexing user " + login + " due to " + relation + " with " + repo.getProperty("name"))
             indexUser(login, depth + 1, maxDepth, token)
@@ -158,7 +159,7 @@ object IndexGithub {
   def indexRepo(login: String, repository: String, depth: Int, maxDepth: Int, token: String) {
     Logger.debug("Indexing github repo " + repository + " by " + login)
     // Create nodes
-    val repo: Node = getOrSaveRepo(login, repository)
+    val repo: Node = getOrSaveRepo(login, repository, None, token)
 
     // if we have to go deeper, let's index forks, watchers, stares & contributors
     if (depth < maxDepth) {
@@ -196,7 +197,8 @@ object IndexGithub {
           Logger.debug("Url " + url + " has " + json.size + " relation of type " + relation)
           for (jsObject <- json) {
             val watcher: String = jsObject.\("owner").\("login").toString().replace("\"", "")
-            val watcherNode: Node = getOrSaveUser(watcher)
+            val avatar: Option[String] = Some(jsObject.\("owner").\("avatar_url").toString().replace("\"", ""))
+            val watcherNode: Node = getOrSaveUser(watcher, avatar, token)
             createRelationship(relation, watcherNode, repo)
             Logger.debug("Indexing user " + watcher + " due to " + relation + " with " + repo.getProperty("name"))
             indexUser(watcher, depth + 1, maxDepth, token)
@@ -232,7 +234,7 @@ object IndexGithub {
    * @param maxDepth
    */
   def indexRepoFromAPIUserReturnRepositories(url: String, login: String, relation: String, depth: Int, maxDepth: Int, token: String) {
-    val user :Node = getOrSaveUser(login)
+    val user :Node = getOrSaveUser(login, None, token)
     val futurereposResp: Future[Response] = getGithubResponse(url, user)
     futurereposResp.map {
       response =>
@@ -243,8 +245,10 @@ object IndexGithub {
           for (jsObject <- json) {
             val repo: String = jsObject.\("name").toString().replace("\"", "")
             val owner: String = jsObject.\("owner").\("login").toString().replace("\"", "")
-            val repoNode: Node = getOrSaveRepo(owner, repo)
-            val userNode: Node = getOrSaveUser(login)
+            val avatar: Option[String] = Some(jsObject.\("owner").\("avatar_url").toString().replace("\"", ""))
+            val description: Option[String] = Some(jsObject.\("description").toString().replace("\"", ""))
+            val repoNode: Node = getOrSaveRepo(owner, repo, description, token)
+            val userNode: Node = getOrSaveUser(login, avatar, token)
             createRelationship(relation, userNode, repoNode)
             Logger.debug("Indexing repo " + owner + "/" + repo + " due to its " + relation + " with " + login)
             indexRepo(owner, repo, depth + 1, maxDepth, token)
@@ -280,7 +284,7 @@ object IndexGithub {
    * @param maxDepth
    */
   def indexUserFromAPIUserReturnUser(url: String, relation: String, login: String, depth: Int, maxDepth: Int, token: String) {
-    val user :Node = getOrSaveUser(login)
+    val user :Node = getOrSaveUser(login, None, token)
     val futureReposResp: Future[Response] = getGithubResponse(url, user)
     futureReposResp.map {
       response =>
@@ -290,8 +294,8 @@ object IndexGithub {
           Logger.debug("User " + login + " " + relation + " " + json.size + " user")
           for (jsObject <- json) {
             val following: String = jsObject.\("login").toString().replace("\"", "")
-            val followingNode: Node = getOrSaveUser(following)
-            val user: Node = getOrSaveUser(login)
+            val avatar: Option[String] = Some(jsObject.\("avatar_url").toString().replace("\"", ""))
+            val followingNode: Node = getOrSaveUser(following, avatar, token)
             if (relation.equalsIgnoreCase(REL_FOLLOW)) {
               createRelationship(REL_FOLLOW, followingNode, user)
             } else {
@@ -328,7 +332,7 @@ object IndexGithub {
    * @param login
    * @return user node
    */
-  def getOrSaveUser(login: String): Node = {
+  def getOrSaveUser(login: String, avatar:Option[String], token :String): Node = {
     val index: Index[Node] = Neo4j.graphDb.index().forNodes(NODE_USER)
     val url: String = GITHUB_HTML_URL + "/" + login
     // if there is nothing in the indexes
@@ -342,6 +346,22 @@ object IndexGithub {
         user.setProperty("login", login)
         user.setProperty("url", url)
         user.setProperty("indexed", false)
+        avatar match {
+          case Some(avatar) => user.setProperty("avatar", avatar)
+          case None => {
+            val userUrl = GITHUB_API_URL + "/users/" + user + "?" + githubAuthParam(token)
+            val futureReposResp: Future[Response] = WS.url(userUrl).get()
+            futureReposResp.map {
+              response =>
+                Logger.debug("Github response code is : " + response.status + " for " + userUrl)
+                if (response.status == 200) {
+                  val json: JsValue = response.json
+                  val avatar: String = json.\("avatar_url").toString().replace("\"", "")
+                  user.setProperty("avatar", avatar)
+                }
+            }
+          }
+        }
 
         // linked node to master repository node
         val root: Node = Neo4j.graphDb.getReferenceNode
@@ -378,7 +398,7 @@ object IndexGithub {
    * @param reposiroty
    * @return repository node
    */
-  def getOrSaveRepo(user: String, reposiroty: String): Node = {
+  def getOrSaveRepo(user: String, reposiroty: String, description :Option[String], token :String): Node = {
     val name: String = user + "/" + reposiroty
     val index: Index[Node] = Neo4j.graphDb.index().forNodes(NODE_REPOSITORY)
     val url: String = GITHUB_HTML_URL + "/" + user + "/" + reposiroty
@@ -395,6 +415,22 @@ object IndexGithub {
         repo.setProperty("repository", reposiroty)
         repo.setProperty("url", url)
         repo.setProperty("indexed", false)
+        description match {
+          case Some(description) => repo.setProperty("description", description)
+          case None => {
+            val repoUrl = GITHUB_API_URL + "/repos/" + user + "/" + reposiroty + "?" + githubAuthParam(token)
+            val futureReposResp: Future[Response] = WS.url(repoUrl).get()
+            futureReposResp.map {
+              response =>
+                Logger.debug("Github response code is : " + response.status + " for " + repoUrl)
+                if (response.status == 200) {
+                  val json: JsValue = response.json
+                  val description: String = json.\("description").toString().replace("\"", "")
+                  repo.setProperty("description", description)
+                }
+            }
+          }
+        }
 
         // linked node to master repository node
         val root: Node = Neo4j.graphDb.getReferenceNode
@@ -406,7 +442,7 @@ object IndexGithub {
         index.add(repo, "user", user)
         index.add(repo, "repository", reposiroty)
 
-        val owner: Node = getOrSaveUser(user)
+        val owner: Node = getOrSaveUser(user, None, token)
         createRelationship(REL_CREATE, owner, repo)
 
 
@@ -462,8 +498,6 @@ object IndexGithub {
       }
     }
   }
-
-
 
   /**
    * Getting github response from url. Adding "if modified since header", if node has been already indexed to prevent API rate limit.
@@ -602,6 +636,8 @@ object IndexGithub {
         "MATCH " +
           "contributors-[:HAS_CONTRIBUTED]->repo, " +
           "contributors-[:STARE]->repos " +
+        "WHERE " +
+          "repo <> repos " +
         "RETURN " +
           "repos.name, COUNT(*) " +
         "ORDER BY " +

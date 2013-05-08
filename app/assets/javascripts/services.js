@@ -207,6 +207,34 @@ angular.module('play', [ ])
                 console.log("[Play:indexing user " + name)
                 var url = '/api/index/user/' + name;
                 $http({ method: 'GET', url: url });
+            },
+            getUserReco:function(name){
+                var url = '/api/reco/user/' + name;
+                return $http.get( url ).then(function (response){
+                    if( response.status == 200 ){
+                        return response.data;
+                    }else{
+                        $rootScope.error = {
+                            title:"Error when retrieving user recommendation.",
+                            message:$rootScope.messages['error.case'] + "Http code (" + url + ") : " + response.status
+                        };
+                        $location.path('/error');
+                    }
+                });
+            },
+            getRepoReco:function(owner, name){
+                var url = '/api/reco/repository/' + owner + '/' + name;
+                return $http.get( url ).then(function (response){
+                    if( response.status == 200 ){
+                        return response.data;
+                    }else{
+                        $rootScope.error = {
+                            title:"Error when retrieving repository recommendation.",
+                            message:$rootScope.messages['error.case'] + "Http code (" + url + ") : " + response.status
+                        };
+                        $location.path('/error');
+                    }
+                });
             }
         }
     });
