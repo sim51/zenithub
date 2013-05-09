@@ -43,8 +43,22 @@
             <div class="row-fluid">
                 <div class="span12">
                     <h3>If you like this repository, you should take a look at thoses </h3>
-                    <div ng-repeat="reco in recos">
-                          {{reco}}
+                    <div id="recos">
+                        <div ng-repeat="reco in recos" class="row-fluid">
+                            <div class="span4">
+                                <div class="row-fluid">
+                                    <div class="span2">
+                                        <a ng-click="popupMember(repository.owner.login)" title="{{reco.owner}}">
+                                            <img ng-src="{{reco.avatar}}" />
+                                        </a>
+                                    </div>
+                                    <div class="span10">
+                                        <h4><a href="#/repo/{{reco.owner}}/{{reco.repository}}">{{reco.repository}}</a> by <a ng-click="popupMember(repository.owner.login)" title="{{reco.owner}}">{{reco.owner}}</a></h4>
+                                        <p>{{reco.description}}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

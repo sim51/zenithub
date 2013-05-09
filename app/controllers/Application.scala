@@ -33,7 +33,7 @@ object Application extends Controller with securesocial.core.SecureSocial {
             Logger.debug("Having user with token !: " + oAuthInfo2.accessToken)
             val cookie:Cookie =  Cookie("token", "\"" + oAuthInfo2.accessToken + "\"", None , "/", None, false, false)
             // we index user
-            IndexGithub.indexUser(user.id.id, 0, 2, oAuthInfo2.accessToken)
+            IndexGithub.indexCurrentUser(0, 2, oAuthInfo2.accessToken)
             Ok(views.html.index(request.user)).withCookies(cookie)
           }
           case None => {
@@ -56,7 +56,7 @@ object Application extends Controller with securesocial.core.SecureSocial {
    * @return
    */
   def indexUser(owner :String, token :String) = Action { implicit request =>
-    IndexGithub.indexUser(owner, 0, 2, token)
+    IndexGithub.indexUser(owner, None, 0, 2, token)
     Ok(Json.toJson("OK"))
   }
 

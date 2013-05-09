@@ -8,7 +8,7 @@ import scala.collection.JavaConverters._
 import ExecutionContext.Implicits.global
 import play.api.Logger
 import play.api.libs.ws.Response
-import play.api.libs.json.{JsValue, JsObject}
+import play.api.libs.json.{Json, JsValue, JsObject}
 import java.util.Date
 import java.text.SimpleDateFormat
 import org.neo4j.cypher.{ExecutionResult, ExecutionEngine}
@@ -77,10 +77,10 @@ object IndexGithub {
    *
    * @param login
    */
-  def indexUser(login: String, depth: Int, maxDepth: Int, token: String) {
+  def indexUser(login: String, avatar :Option[String], depth: Int, maxDepth: Int, token: String) {
     Logger.debug("Indexing github user " + login)
     // Create nodes
-    val user: Node = getOrSaveUser(login, None, token)
+    val user: Node = getOrSaveUser(login, avatar, token)
 
     // we index user, only
     if (depth < maxDepth) {
@@ -107,6 +107,25 @@ object IndexGithub {
   }
 
   /**
+   * Index github current user into neo4j database.
+   *
+   */
+  def indexCurrentUser(depth: Int, maxDepth: Int, token: String) {
+    val userUrl = GITHUB_API_URL + "/user?" + githubAuthParam(token)
+    val futureReposResp: Future[Response] = WS.url(userUrl).get()
+    futureReposResp.map {
+      response =>
+        Logger.debug("Github response code is : " + response.status + " for " + userUrl)
+        if (response.status == 200) {
+          val json: JsValue = response.json
+          val login: String = json.\("login").toString().replace("\"", "")
+          val avatar: String = json.\("avatar_url").toString().replace("\"", "")
+          indexUser(login, Some(avatar), depth, maxDepth, token)
+        }
+    }
+  }
+
+  /**
    * Index users (ie watchers, stares, contributors) from a repository API call that return user.
    *
    * @param url
@@ -127,7 +146,7 @@ object IndexGithub {
             val user: Node = getOrSaveUser(login, avatar, token)
             createRelationship(relation, user, repo)
             Logger.debug("Indexing user " + login + " due to " + relation + " with " + repo.getProperty("name"))
-            indexUser(login, depth + 1, maxDepth, token)
+            indexUser(login, None, depth + 1, maxDepth, token)
           }
           response.header("Link") match {
             case Some(link) => {
@@ -201,7 +220,7 @@ object IndexGithub {
             val watcherNode: Node = getOrSaveUser(watcher, avatar, token)
             createRelationship(relation, watcherNode, repo)
             Logger.debug("Indexing user " + watcher + " due to " + relation + " with " + repo.getProperty("name"))
-            indexUser(watcher, depth + 1, maxDepth, token)
+            indexUser(watcher, None, depth + 1, maxDepth, token)
           }
           // let see if there a pagination by looking at Link header's param.
           response.header("Link") match {
@@ -302,7 +321,7 @@ object IndexGithub {
               createRelationship(REL_FOLLOW, user, followingNode)
             }
             Logger.debug("Indexing user " + following + " due to " + relation + " with " + login)
-            indexUser(following, depth + 1, maxDepth, token)
+            indexUser(following, None, depth + 1, maxDepth, token)
           }
           // let see if there a pagination by looking at Link header's param.
           response.header("Link") match {
@@ -346,10 +365,14 @@ object IndexGithub {
         user.setProperty("login", login)
         user.setProperty("url", url)
         user.setProperty("indexed", false)
+
         avatar match {
-          case Some(avatar) => user.setProperty("avatar", avatar)
+          case Some(avatar) => {
+            Logger.debug("Avatar url for " + login + " is " + avatar)
+            user.setProperty("avatar", avatar)
+          }
           case None => {
-            val userUrl = GITHUB_API_URL + "/users/" + user + "?" + githubAuthParam(token)
+            val userUrl = GITHUB_API_URL + "/users/" + login + "?" + githubAuthParam(token)
             val futureReposResp: Future[Response] = WS.url(userUrl).get()
             futureReposResp.map {
               response =>
@@ -357,7 +380,11 @@ object IndexGithub {
                 if (response.status == 200) {
                   val json: JsValue = response.json
                   val avatar: String = json.\("avatar_url").toString().replace("\"", "")
+                  Logger.debug("Avatar url for " + login + " is " + avatar)
+                  val innerTx: Transaction = Neo4j.graphDb.beginTx()
                   user.setProperty("avatar", avatar)
+                  innerTx.success()
+                  innerTx.finish()
                 }
             }
           }
@@ -379,12 +406,13 @@ object IndexGithub {
         user
       } catch {
         case e: Exception => {
-          Logger.error("Error when creating relationship", e)
+          Logger.error("Error when creating user node", e)
           throw e
         }
       } finally {
         tx.finish()
       }
+
     }
     else {
       index.get("login", login).getSingle
@@ -609,8 +637,8 @@ object IndexGithub {
     users
   }
 
-  def getRepositoryReco(login :Option[String], name :String) :List[String] = {
-    var repos :List[String] = List()
+  def getRepositoryReco(login :Option[String], name :String) :List[JsObject] = {
+    var repos :List[JsObject] = List()
     val engine :ExecutionEngine = new ExecutionEngine(Neo4j.graphDb);
     val query :String = login match {
       case Some(login) => {
@@ -620,12 +648,13 @@ object IndexGithub {
         "MATCH " +
           "contributors-[:HAS_CONTRIBUTED]->repo, " +
           "contributors-[:STARE]->repos, " +
-          "me-[r?:STARE]->repos " +
+          "me-[r?:STARE]->repos ," +
+          "creator-[:HAS_CREATED]->repos " +
         "WHERE " +
           "repos <> repo AND "
           "r IS NULL " +
         "RETURN " +
-          "repos.name, COUNT(*) " +
+          "creator.login, creator.avatar, repos.repository, repos.description, COUNT(*) " +
         "ORDER BY " +
           "COUNT(*) DESC " +
         "LIMIT 3"
@@ -635,11 +664,12 @@ object IndexGithub {
           "repo=node:REPOSITORY(name=\"" + name + "\") " +
         "MATCH " +
           "contributors-[:HAS_CONTRIBUTED]->repo, " +
-          "contributors-[:STARE]->repos " +
+          "contributors-[:STARE]->repos, " +
+          "creator-[:HAS_CREATED]->repos " +
         "WHERE " +
           "repo <> repos " +
         "RETURN " +
-          "repos.name, COUNT(*) " +
+          "creator.login, creator.avatar, repos.repository, repos.description, COUNT(*) " +
         "ORDER BY " +
           "COUNT(*) DESC " +
         "LIMIT 3"
@@ -648,7 +678,12 @@ object IndexGithub {
     Logger.debug(query)
     val result :ExecutionResult = engine.execute(query);
     result.foreach( row => {
-      repos = row.getOrElse("repos.name", "").toString :: repos
+      repos = Json.obj(
+        "owner" -> row.getOrElse("creator.login", "").toString,
+        "avatar" -> row.getOrElse("creator.avatar", "").toString,
+        "repository" -> row.getOrElse("repos.repository", "").toString,
+        "description" -> row.getOrElse("repos.description", "").toString
+      ) :: repos
     })
     repos
   }
