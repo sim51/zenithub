@@ -667,7 +667,7 @@ object IndexGithub {
           "repos <> repo AND "
           "r IS NULL " +
         "RETURN " +
-          "creator.login, creator.avatar, repos.repository, repos.description?, COUNT(*) " +
+          "creator.login, creator.avatar?, repos.repository, repos.description?, COUNT(*) " +
         "ORDER BY " +
           "COUNT(*) DESC " +
         "LIMIT 10"
@@ -682,7 +682,7 @@ object IndexGithub {
         "WHERE " +
           "repo <> repos " +
         "RETURN " +
-          "creator.login, creator.avatar, repos.repository, repos.description?, COUNT(*) " +
+          "creator.login, creator.avatar?, repos.repository, repos.description?, COUNT(*) " +
         "ORDER BY " +
           "COUNT(*) DESC " +
         "LIMIT 10"
@@ -693,7 +693,7 @@ object IndexGithub {
     result.foreach( row => {
       repos = Json.obj(
         "owner" -> row.getOrElse("creator.login", "").toString,
-        "avatar" -> row.getOrElse("creator.avatar", "").toString,
+        "avatar" -> row.getOrElse("creator.avatar?", "").toString,
         "repository" -> row.getOrElse("repos.repository", "").toString,
         "description" -> row.getOrElse("repos.description?", "").toString
       ) :: repos

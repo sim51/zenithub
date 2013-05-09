@@ -14,9 +14,6 @@ function RepositoryListCtrl($scope, $rootScope, $routeParams, $location, Github,
 		});
 	}
     $scope.repoClick = function(owner, name){
-        if($rootScope.isConnected) {
-            Play.indexRepo(owner, name, $rootScope.token)
-        }
         $location.path('/repo/'+ owner + '/' + name);
     }
 	$scope.orderProp = 'name';
@@ -25,7 +22,7 @@ function RepositoryListCtrl($scope, $rootScope, $routeParams, $location, Github,
 /* 
  *	Repository general informations (/repo/:owner/:repo).
  */
-function RepositoryHomeCtrl($scope, $routeParams, Github, Play) {
+function RepositoryHomeCtrl($scope, $routeParams, $rootScope, Github, Play) {
 	$('#loading').show();
 	var owner = $routeParams.owner;
 	var repo = $routeParams.repository;
@@ -33,6 +30,9 @@ function RepositoryHomeCtrl($scope, $routeParams, Github, Play) {
 		$scope.repository = response;
 		$('#loading').hide();
 	});
+    if($rootScope.isConnected) {
+        Play.indexRepo(owner, repo, $rootScope.token)
+    }
     Play.getRepoReco(owner, repo).then(function(response){
         $scope.recos = response;
     })
