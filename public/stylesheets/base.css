@@ -95,7 +95,7 @@ div.repository img{
 #member .user div.info ul li strong{
 	width:100px;
 }
-member .user  ul.stats li strong{
+#member .user  ul.stats li strong{
 	width:100px;
 }
 #member .user div.info ul li{
@@ -147,4 +147,8 @@ div#map{
 	height: 500px;
 	background-color:#bed0de;
 	cursor: pointer;
+}
+
+footer{
+    bottom:0;
 }

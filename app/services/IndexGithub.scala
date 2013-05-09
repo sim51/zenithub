@@ -9,7 +9,7 @@ import ExecutionContext.Implicits.global
 import play.api.Logger
 import play.api.libs.ws.Response
 import play.api.libs.json.{Json, JsValue, JsObject}
-import java.util.Date
+import java.util.{Random, Date}
 import java.text.SimpleDateFormat
 import org.neo4j.cypher.{ExecutionResult, ExecutionEngine}
 
@@ -616,6 +616,7 @@ object IndexGithub {
 
   def getUserReco(name :String) :List[String] ={
     var users :List[String] = List[String]()
+    var recos :List[String] = List[String]()
     val engine :ExecutionEngine = new ExecutionEngine(Neo4j.graphDb);
     val result :ExecutionResult = engine.execute("" +
       "START " +
@@ -630,15 +631,27 @@ object IndexGithub {
         "friend_of_friend.login, COUNT(*) " +
       "ORDER BY " +
         "COUNT(*) DESC " +
-      "LIMIT 3");
+      "LIMIT 10");
     result.foreach( row => {
       users = row.getOrElse("friend_of_friend.login", "").toString :: users
     })
-    users
+    // a little random on the 10 first item to not show the same reco every time
+    if(users.length > 0) {
+      val rand = new Random(System.currentTimeMillis())
+      var random_index = 0
+      while(recos.length < 3){
+        random_index = rand.nextInt(users.length)
+        if(!recos.contains(users(random_index))){
+          recos = users(random_index) :: recos
+        }
+      }
+    }
+    recos
   }
 
   def getRepositoryReco(login :Option[String], name :String) :List[JsObject] = {
     var repos :List[JsObject] = List()
+    var recos :List[JsObject] = List()
     val engine :ExecutionEngine = new ExecutionEngine(Neo4j.graphDb);
     val query :String = login match {
       case Some(login) => {
@@ -654,10 +667,10 @@ object IndexGithub {
           "repos <> repo AND "
           "r IS NULL " +
         "RETURN " +
-          "creator.login, creator.avatar, repos.repository, repos.description, COUNT(*) " +
+          "creator.login, creator.avatar, repos.repository, repos.description?, COUNT(*) " +
         "ORDER BY " +
           "COUNT(*) DESC " +
-        "LIMIT 3"
+        "LIMIT 10"
       }
       case None => {
         "START " +
@@ -669,22 +682,33 @@ object IndexGithub {
         "WHERE " +
           "repo <> repos " +
         "RETURN " +
-          "creator.login, creator.avatar, repos.repository, repos.description, COUNT(*) " +
+          "creator.login, creator.avatar, repos.repository, repos.description?, COUNT(*) " +
         "ORDER BY " +
           "COUNT(*) DESC " +
-        "LIMIT 3"
+        "LIMIT 10"
       }
     }
     Logger.debug(query)
-    val result :ExecutionResult = engine.execute(query);
+    val result :ExecutionResult = engine.execute(query)
     result.foreach( row => {
       repos = Json.obj(
         "owner" -> row.getOrElse("creator.login", "").toString,
         "avatar" -> row.getOrElse("creator.avatar", "").toString,
         "repository" -> row.getOrElse("repos.repository", "").toString,
-        "description" -> row.getOrElse("repos.description", "").toString
+        "description" -> row.getOrElse("repos.description?", "").toString
       ) :: repos
     })
-    repos
+    // a little random on the 10 first item to not show the same reco every time
+    if(repos.length > 0){
+      val rand = new Random(System.currentTimeMillis())
+      var random_index = 0
+      while(recos.length < 3){
+        random_index = rand.nextInt(repos.length)
+        if(!recos.contains(repos(random_index))){
+          recos = repos(random_index) :: recos
+        }
+      }
+    }
+    recos
   }
 }
