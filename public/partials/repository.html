@@ -47,12 +47,12 @@
                         <div ng-repeat="reco in recos" class="row-fluid">
                             <div class="span4">
                                 <div class="row-fluid">
-                                    <div class="span2">
+                                    <div class="span3">
                                         <a ng-click="popupMember(repository.owner.login)" title="{{reco.owner}}">
                                             <img ng-src="{{reco.avatar}}" />
                                         </a>
                                     </div>
-                                    <div class="span10">
+                                    <div class="span9">
                                         <h4><a href="#/repo/{{reco.owner}}/{{reco.repository}}">{{reco.repository}}</a> by <a ng-click="popupMember(repository.owner.login)" title="{{reco.owner}}">{{reco.owner}}</a></h4>
                                         <p>{{reco.description}}</p>
                                     </div>
