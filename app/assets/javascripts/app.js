@@ -7,6 +7,7 @@ var app = angular.module('application', ['ngCookies', 'zenithub', 'github', 'pla
 app.config(function($routeProvider) {
 		$routeProvider
 			.when('/error', {templateUrl: '/assets/partials/error.html', controller: ErrorCtrl})
+            .when('/me', {templateUrl: '/assets/partials/user.html', controller: MyProfileCtrl})
 	      	.when('/repo/:owner/:repository', {templateUrl: '/assets/partials/repository.html', controller: RepositoryHomeCtrl})
 	      	.when('/repo/:owner/:repository/members', {templateUrl: '/assets/partials/members.html', controller: RepositoryMembersCtrl})
 	      	.when('/repo/:owner/:repository/commits', {templateUrl: '/assets/partials/commits.html', controller: RepositoryCommitsCtrl})

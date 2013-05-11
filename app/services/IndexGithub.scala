@@ -321,7 +321,7 @@ object IndexGithub {
               createRelationship(REL_FOLLOW, user, followingNode)
             }
             Logger.debug("Indexing user " + following + " due to " + relation + " with " + login)
-            indexUser(following, None, depth + 1, maxDepth, token)
+            indexUser(following, avatar, depth + 1, maxDepth, token)
           }
           // let see if there a pagination by looking at Link header's param.
           response.header("Link") match {
@@ -454,7 +454,10 @@ object IndexGithub {
                 if (response.status == 200) {
                   val json: JsValue = response.json
                   val description: String = json.\("description").toString().replace("\"", "")
+                  val innerTx: Transaction = Neo4j.graphDb.beginTx()
                   repo.setProperty("description", description)
+                  innerTx.success()
+                  innerTx.finish()
                 }
             }
           }
@@ -582,7 +585,7 @@ object IndexGithub {
   * @return
   */
   def getUpdateDate(node: Node): String = {
-    val time: Long = node.getProperty("updated").asInstanceOf[Long]
+    val time: Long = node.getProperty("updated", 0.asInstanceOf[Long]).asInstanceOf[Long]
     val date: Date = new Date(time)
     val format: SimpleDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z")
     format.format(date)
@@ -614,26 +617,31 @@ object IndexGithub {
     params
   }
 
-  def getUserReco(name :String) :List[String] ={
-    var users :List[String] = List[String]()
-    var recos :List[String] = List[String]()
+  def getUserReco(name :String) :List[JsObject] ={
+    var users :List[JsObject] = List[JsObject]()
+    var recos :List[JsObject] = List[JsObject]()
     val engine :ExecutionEngine = new ExecutionEngine(Neo4j.graphDb);
-    val result :ExecutionResult = engine.execute("" +
+    val query :String = "" +
       "START " +
-        "me=node:USER(login=\"" + name + "\") " +
+      "me=node:USER(login=\"" + name + "\") " +
       "MATCH " +
-        "me-[:FOLLOW]->friend-[:FOLLOW]->friend_of_friend, " +
-        "me-[r?:FOLLOW]->friend_of_friend " +
+      "me-[:FOLLOW]->friend-[:FOLLOW]->friend_of_friend, " +
+      "me-[r?:FOLLOW]->friend_of_friend " +
       "WHERE " +
-        "(r IS NULL) AND " +
-        "friend_of_friend <> me " +
+      "(r IS NULL) AND " +
+      "friend_of_friend <> me " +
       "RETURN " +
-        "friend_of_friend.login, COUNT(*) " +
+      "friend_of_friend.login, friend_of_friend.avatar?, COUNT(*) " +
       "ORDER BY " +
-        "COUNT(*) DESC " +
-      "LIMIT 10");
+      "COUNT(*) DESC " +
+      "LIMIT 10"
+    Logger.debug(query)
+    val result :ExecutionResult = engine.execute(query);
     result.foreach( row => {
-      users = row.getOrElse("friend_of_friend.login", "").toString :: users
+      users = Json.obj(
+          "login" -> row.getOrElse("friend_of_friend.login", "").toString,
+          "avatar" -> row.getOrElse("friend_of_friend.avatar?", "").toString
+        ) :: users
     })
     // a little random on the 10 first item to not show the same reco every time
     if(users.length > 0) {

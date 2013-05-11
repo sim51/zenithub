@@ -31,7 +31,7 @@
                         <ul class="nav" id="user-menu">
                             @user match {
                                 case Some(usr) => {
-                                    <li class="dropdown">
+                                    <li class="dropdown open">
                                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                             <img src="@usr.avatarUrl" alt="avatar" />
                                             @usr.fullName
@@ -39,6 +39,7 @@
                                         </a>
                                         <ul class="dropdown-menu">
                                             <li><a href="@securesocial.controllers.routes.LoginPage.logout()">@Messages("common.logout")</a></li>
+                                            <li><a href="/#/me">My profile</a></li>
                                         </ul>
                                     </li>
                                 }
@@ -83,7 +84,12 @@
         <div id="member" class="modal hide fade">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h3>{{user.login}}</h3>
+                <h3>
+                    {{user.login}}
+                    <a href="https://github.com/{{user.login}}" target="_blank" title="See it on github">
+                        <i class="icon-github"></i>
+                    </a>
+                </h3>
             </div>
             <div class="modal-body user">
                 <div class="row-fluid ng-cloak">

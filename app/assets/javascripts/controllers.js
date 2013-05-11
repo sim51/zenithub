@@ -178,6 +178,21 @@ function RepositoryStatsGeoCtrl($scope, $routeParams, Github, Nominatim) {
 	$('#sidenav').affix();
 }
 
+/**
+ * Controller for 'My profile' page.
+ */
+function MyProfileCtrl($scope, Github, Play) {
+    $('#loading').show();
+    Github.me().then(function(response){
+        $scope.user = response;
+        $("#loading").hide();
+        Play.getUserReco(response.login).then(function(response){
+            $scope.recos = response;
+        });
+    });
+
+}
+
 /*
  *  Error.
  */

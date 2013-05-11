@@ -116,6 +116,21 @@ angular.module('github', ['zenithub'])
                             $location.path('/error');
                         }
                     });   
+            },
+            me:function(){
+                var url = Config.githuburl + '/user?callback=JSON_CALLBACK';
+                if($rootScope.isConnected) {
+                    url += '&access_token=' + $rootScope.token;
+                }
+                return $http.jsonp( url, {cache:true} )
+                    .then(function (response){
+                        if( response.status == 200 && response.data.meta.status == 200){
+                            return response.data.data;
+                        }else{
+                            $rootScope.error = response.data.data.message;
+                            $location.path('/error');
+                        }
+                    });
             }
         }
     })
