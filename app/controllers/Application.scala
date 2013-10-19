@@ -13,6 +13,8 @@ import concurrent.Future
 import services.{IndexGithub, Neo4j}
 import org.neo4j.graphdb._
 
+
+
 /**
  * Application's controllers.
  *
@@ -92,7 +94,7 @@ object Application extends Controller with securesocial.core.SecureSocial {
   def repoRecommendation(owner :String, name :String) = Action { implicit request =>
     Ok(Json.toJson(IndexGithub.getRepositoryReco(request.getQueryString("login"), owner + "/" + name)))
   }
-  
+
   /**
    * JSON action to retrive all messages.
    * @return

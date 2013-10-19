@@ -17,3 +17,6 @@ zenithub.iml
 zenithub.ipr
 zenithub.iws
 project/target
+.idea/
+.idea_modules/
+neo4j

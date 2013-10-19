@@ -19,7 +19,7 @@ package services
 import play.api.{Logger, Application}
 import securesocial.core._
 import securesocial.core.providers.Token
-import securesocial.core.UserId
+import securesocial.core.IdentityId
 import play.api.cache.Cache
 import play.api.Play.current
 import models.User
@@ -36,7 +36,7 @@ class SecureSocialUserService(application: Application) extends UserServicePlugi
    * @param id the user id
    * @return an optional user
    */
-  def find(id: UserId): Option[Identity] = {
+  def find(id: IdentityId): Option[Identity] = {
     User.findFromIdentityId(id) match {
       case Some(user) => {
         Logger.debug("Find user = %s".format(user))

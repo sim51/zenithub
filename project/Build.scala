@@ -9,9 +9,9 @@ object ApplicationBuild extends Build {
     val appVersion      = "1.0-SNAPSHOT"
 
     val appDependencies = Seq(
-      "securesocial" %% "securesocial" % "master-SNAPSHOT",
-      "org.neo4j" % "neo4j" % "1.9.RC1",
-      "org.neo4j.app" % "neo4j-server" % "1.9.RC1" classifier "static-web" classifier "" exclude("org.slf4j", "slf4j-jdk14"),
+      "securesocial" %% "securesocial" % "logisima-SNAPSHOT",
+      "org.neo4j" % "neo4j" % "1.9",
+      "org.neo4j.app" % "neo4j-server" % "1.9" classifier "static-web" classifier "" exclude("org.slf4j", "slf4j-jdk14"),
       "com.sun.jersey" % "jersey-core" % "1.9",
       "ch.qos.logback" % "logback-core" % "1.0.3" force(), // this should override the Play version
       "ch.qos.logback" % "logback-classic" % "1.0.3" force(),
@@ -20,6 +20,7 @@ object ApplicationBuild extends Build {
     )
 
     val main = play.Project(appName, appVersion, appDependencies).settings(
+      resolvers += "Local Play Repository" at "file://usr/local/play/play2/current/repository/local",
       resolvers += Resolver.url("sbt-plugin-snapshots", url("http://repo.scala-sbt.org/scalasbt/sbt-plugin-snapshots/"))(Resolver.ivyStylePatterns),
       resolvers += Resolver.url("sbt-plugin-release", url("http://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/"))(Resolver.ivyStylePatterns),
       resolvers += Resolver.url("typesafe-release", url("http://repo.typesafe.com/typesafe/releases/"))(Resolver.ivyStylePatterns),

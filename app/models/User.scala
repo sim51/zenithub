@@ -9,7 +9,7 @@ import scala.Option
 import play.api.libs.json.{Json, JsNull, JsString, JsObject}
 import securesocial.core
 import anorm.~
-import core.{OAuth2Info, Identity, SocialUser, UserId}
+import core.{OAuth2Info, Identity, SocialUser, IdentityId}
 import anorm.Id
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsString
@@ -48,7 +48,7 @@ object User {
    * @return
    */
   def createFromIdentity(identity: Identity): User = {
-    User.findFromIdentityId(identity.id) match {
+    User.findFromIdentityId(identity.identityId) match {
       case Some(user) => {user}
       case None => {
         DB.withTransaction { implicit connection =>
@@ -101,8 +101,8 @@ object User {
                 )
             """
           ).on(
-            'id -> identity.id.id,
-            'provider -> identity.id.providerId,
+            'id -> identity.identityId.userId,
+            'provider -> identity.identityId.providerId,
             'json -> json.getOrElse("").toString,
             'user_id -> id
           ).executeUpdate()
@@ -120,7 +120,7 @@ object User {
    * @param userId
    * @return models.User
    */
-  def findFromIdentityId(userId:UserId): Option[User] = {
+  def findFromIdentityId(userId:IdentityId): Option[User] = {
     DB.withConnection { implicit connection =>
       SQL(
         """
@@ -134,7 +134,7 @@ object User {
             userAccount.provider={provider}
         """
       ).on(
-        'id -> userId.id,
+        'id -> userId.userId,
         'provider -> userId.providerId
       ).as(User.simple.singleOpt)
     }
@@ -147,12 +147,12 @@ object User {
           case Some(json) => {
             Logger.debug("JSON is " + json.as[JsObject].\("accesToken").as[String])
             val token: String = json.as[JsObject].\("accesToken").as[String]
-            new SocialUser( UserId(account.id, account.provider), user.firstname, user.lastname, user.fullname, user.email, user.avatarUrl, core.AuthenticationMethod.OAuth2, None, Some(OAuth2Info(token)), None )
+            new SocialUser( IdentityId(account.id, account.provider), user.firstname, user.lastname, user.fullname, user.email, user.avatarUrl, core.AuthenticationMethod.OAuth2, None, Some(OAuth2Info(token)), None )
           }
-          case None => new SocialUser( UserId("", ""), user.firstname, user.lastname, user.fullname, user.email, user.avatarUrl, core.AuthenticationMethod.OAuth2, None, None, None )
+          case None => new SocialUser( IdentityId("", ""), user.firstname, user.lastname, user.fullname, user.email, user.avatarUrl, core.AuthenticationMethod.OAuth2, None, None, None )
         }
       }
-      case None => new SocialUser( UserId("", ""), user.firstname, user.lastname, user.fullname, user.email, user.avatarUrl, core.AuthenticationMethod.OAuth2, None, None, None )
+      case None => new SocialUser( IdentityId("", ""), user.firstname, user.lastname, user.fullname, user.email, user.avatarUrl, core.AuthenticationMethod.OAuth2, None, None, None )
     }
    ident
   }
